@@ -1,12 +1,12 @@
-import { http, HttpResponse } from "msw";
 import { faker } from "@faker-js/faker";
-import type { Course } from "../types/course";
+import { http, HttpResponse } from "msw";
 import type { Category } from "../types/category";
+import type { Course } from "../types/course";
 
 const categories: Category[] = ["디자인", "개발", "마케팅", "비즈니스"];
 
 const createMockCourse = (
-  category: Category,
+  category: string,
   override?: Partial<Course>
 ): Course => ({
   id: faker.string.uuid(),

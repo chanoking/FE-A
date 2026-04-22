@@ -1,57 +1,62 @@
-import React, {useEffect, useState, useMemo} from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import "../css/common.css";
 import "../css/courses.css";
+import type { Course } from "../types/course";
 
 export default function Courses() {
-    const [categories, setCategories] = useState(["전체", "디자인", "개발", "비즈니스", "마케팅"]);
-    const [ctgImgs, setCtgImgs] = useState(["🌐", "🎨", "⚙️", "📊", "🎯"]);
-    const [selectedCategory, setSelectedCategory] = useState("전체");
-    const [courses, setCourses] = useState([]);
-    const [courseMetrics, setCourseMetrics] = useState(new Map());
+  const categories = ["전체", "디자인", "개발", "비즈니스", "마케팅"] as const;
+  const ctgImgs: string[] = ["🌐", "🎨", "⚙️", "📊", "🎯"];
 
-    useEffect(() => {
-        const fetchCourses = async () => {
-            const res = await fetch("http://localhost:5174/courses");
-            const data = await res.json();
+  type CategoryWithAll = (typeof categories)[number];
 
-            setCourses(data);
-        }
-        fetchCourses();
-    }, []);
+  const [selectedCategory, setSelectedCategory] =
+    useState<CategoryWithAll>("전체");
+  const [courses, setCourses] = useState<Course[]>([]);
 
-    const filteredCourses = useMemo(() => {
-        const map = new Map();
+  const filteredCourses = useMemo(() => {
+    if (selectedCategory === "전체") return courses;
 
-        for(let course of courses){
-            if(map.has(course.category)){
-                map.set(course.category, new )
-            }
-        }
-        return selectedCategory === "전체"
-            ? courses : 0
-    }, [courses, selectedCategory])
+    return courses.filter((course) => course.category === selectedCategory);
+  }, [courses, selectedCategory]);
 
-    const clickCategory = (category) => {
-        setSelectedCategory(category);
-    }
+  const clickCategory = (category: CategoryWithAll) => {
+    setSelectedCategory(category);
+  };
+  useEffect(() => {
+    const fetchCourses = async () => {
+      const res = await fetch("http://localhost:5175/courses");
+      const data = await res.json();
+      console.log(data);
+      setCourses(data);
+    };
+    fetchCourses();
+  }, []);
 
-    return (
-        <div className="page">
-            <div className="categories">
-                {categories.map((category, idx) => (
-                    <div 
-                        className={`category ${selectedCategory === category ? "active" : ""}`}
-                        key={idx}
-                        onClick={() => clickCategory(category)}
-                        >
-                        <div className="category-img">{ctgImgs[idx]}</div>
-                        <div className="category-txt">{category}</div>
-                    </div>
-                ))}
-            </div>
-            <div className="lectures">
-                {}
-            </div>
-        </div>
-    )
+  return (
+    <div className="page">
+      <div className="categories">
+        {categories.map((category, idx) => (
+          <div
+            className={`category ${
+              selectedCategory === category ? "active" : ""
+            }`}
+            key={idx}
+            onClick={() => {
+              clickCategory(category);
+            }}
+          >
+            <div className="category-img">{ctgImgs[idx]}</div>
+            <div className="category-txt">{category}</div>
+          </div>
+        ))}
+      </div>
+      <div className="lectures">
+        {filteredCourses.map((course, idx) => (
+          <React.Fragment key={idx}>
+            <div className="course">{course.category}</div>
+          </React.Fragment>
+        ))}
+      </div>
+    </div>
+  );
 }
