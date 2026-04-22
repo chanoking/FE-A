@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useState, useMemo} from "react";
 import "../css/common.css";
 import "../css/courses.css";
 
@@ -7,15 +7,29 @@ export default function Courses() {
     const [ctgImgs, setCtgImgs] = useState(["🌐", "🎨", "⚙️", "📊", "🎯"]);
     const [selectedCategory, setSelectedCategory] = useState("전체");
     const [courses, setCourses] = useState([]);
+    const [courseMetrics, setCourseMetrics] = useState(new Map());
 
     useEffect(() => {
         const fetchCourses = async () => {
             const res = await fetch("http://localhost:5174/courses");
             const data = await res.json();
+
             setCourses(data);
         }
         fetchCourses();
     }, []);
+
+    const filteredCourses = useMemo(() => {
+        const map = new Map();
+
+        for(let course of courses){
+            if(map.has(course.category)){
+                map.set(course.category, new )
+            }
+        }
+        return selectedCategory === "전체"
+            ? courses : 0
+    }, [courses, selectedCategory])
 
     const clickCategory = (category) => {
         setSelectedCategory(category);
@@ -34,6 +48,9 @@ export default function Courses() {
                         <div className="category-txt">{category}</div>
                     </div>
                 ))}
+            </div>
+            <div className="lectures">
+                {}
             </div>
         </div>
     )
