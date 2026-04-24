@@ -7,6 +7,59 @@
   position: relative;
 }
 
+.apply-terms-locate {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.apply-terms-layout {
+  width: 640px;
+  height: 500px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  background-color: white;
+}
+
+.apply-terms-header {
+  width: 100%;
+  padding: 20px 30px;
+}
+
+.apply-terms-title {
+  font-weight: 700;
+  font-size: 27px;
+  margin-top: 10px;
+  text-align: center;
+}
+
+.apply-terms-body {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  align-items: flex-start;
+  padding: 10px 15px;
+  margin-top: 20px;
+}
+
+.close-terms {
+  position: absolute;
+  top: 5px;
+  left: 3px;
+  width: 30px;
+  height: 30px;
+  font-size: 22px;
+  color: rgba(107, 114, 128, 0.5);
+  line-height: 22px;
+  cursor: pointer;
+}
+
 .confirm-header {
   text-align: center;
   margin-bottom: 32px;
@@ -61,11 +114,21 @@
   color: #71717b;
 }
 
+.confirm-label-agreement {
+  flex: 0, 0, 130px;
+}
+
 .confirm-value {
   flex: 1;
   text-align: right;
   font-size: 15px;
   color: #202938;
+}
+
+.confirm-value-agreement {
+  flex: 1;
+  text-align: right;
+  cursor: pointer;
 }
 
 .confirm-reason-box {
@@ -109,15 +172,20 @@
 }
 
 .Agreement-Checkbox {
-    width: 14px;
-    height: 14px;
+  width: 14px;
+  height: 14px;
 }
 
 .Agreement-Title {
-    font-size: 14.5px;
-    font-weight: bold;
+  font-size: 14.5px;
+  font-weight: bold;
+}
+
+.required {
+  color: red;
+  font-weight: 500;
 }
 
 .agreement {
-    border-bottom: 1px solid #edf0f3;
+  border-bottom: 1px solid #edf0f3;
 }
