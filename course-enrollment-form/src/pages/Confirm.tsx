@@ -1,3 +1,4 @@
+import {useState} from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import "../css/confirm.css";
 
@@ -5,7 +6,11 @@ export default function Confirm() {
   const location = useLocation();
   const navigate = useNavigate();
 
+  const [popup, setPopup] = useState(false);
+
   const {course, info} = location.state ?? {};
+
+  const terms = ["수강신청은 신청서 작성 및 결제 완료시 최종 확정됩니다", "결제 완료 후에는 별도의 취소 요청이 없는 한 자동으로 수강이 시작됩니다"];
 
   return (
     <div className="confirm-homepage">
@@ -58,14 +63,41 @@ export default function Confirm() {
           </div>
         </section>
 
+        <section className="confirm-section">
+            <h2 className="confirm-section-title">이용약관</h2>
+
+            <div className="confirm-row agreement">
+                <label>
+                    <input 
+                        type="checkbox"
+                        className="Agreement-Checkbox" />
+                    <span className="Agreement-Title">약관 전체동의</span>
+                </label>
+            </div>
+
+            <div className="confirm-row">
+                <label>
+                    <input 
+                        type="checkbox"
+                        className="Agreement-Checkbox" />
+                    <span className="Agreement-Title">수강신청약관 동의</span>
+                </label>
+            </div>
+
+        </section>
+
         <div className="confirm-button-area">
           <button 
             className="confirm-button secondary"
             onClick={() => navigate("/enrollment-personal", {state: {course, info}})}
             >수정하기</button>
-          <button className="confirm-button primary">최종 제출</button>
+          <button 
+            className="confirm-button primary"
+            onClick={() => setPopup(true)}
+            >최종 제출</button>
         </div>
       </main>
+
     </div>
   );
 }

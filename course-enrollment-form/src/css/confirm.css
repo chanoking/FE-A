@@ -4,6 +4,7 @@
   user-select: none;
   background: #f8fafc;
   padding: 48px 16px;
+  position: relative;
 }
 
 .confirm-header {
@@ -105,4 +106,18 @@
 .confirm-button.primary {
   background: #2563eb;
   color: white;
+}
+
+.Agreement-Checkbox {
+    width: 14px;
+    height: 14px;
+}
+
+.Agreement-Title {
+    font-size: 14.5px;
+    font-weight: bold;
+}
+
+.agreement {
+    border-bottom: 1px solid #edf0f3;
 }
