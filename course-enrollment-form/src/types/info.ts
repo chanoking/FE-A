@@ -3,4 +3,5 @@ export interface Info {
   email: string;
   phone: string;
   reason: string;
+  groupName: string;
 }

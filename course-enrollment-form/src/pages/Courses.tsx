@@ -80,7 +80,7 @@ export default function Courses() {
                 selectedCategory === category ? "active" : ""
               }`}
             >
-              {category}
+              {category}∫
             </div>
           </div>
         ))}
@@ -152,7 +152,7 @@ export default function Courses() {
                   }
                   personalActive
                     ? navigate("/enrollment-personal", { state: { course } })
-                    : navigate("/enrollment-group");
+                    : navigate("/enrollment-group", { state: { course } });
                 }}
               >
                 수강신청
