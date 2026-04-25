@@ -1,0 +1,68 @@
+.Complete-Page {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 80px;
+  gap: 20px;
+}
+
+.Complete-Header {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 40px;
+}
+
+.Complete-Header-Title {
+  font-weight: bold;
+  padding: 10px 20px;
+  font-size: 32px;
+  width: auto;
+}
+
+.Complete-Body {
+  position: relative;
+  width: 100%;
+  height: 700px;
+}
+
+.Complete-Show {
+  position: absolute;
+  top: 30%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 50%;
+  height: 50%;
+}
+
+.Complete-Show-Layout {
+  display: flex;
+  flex-direction: column;
+  padding: 12px 24px;
+  border-radius: 3px;
+  border: 1px solid #ccc;
+  width: 100%;
+  gap: 20px;
+  justify-content: center;
+}
+.Complete-Registration-Row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: 5px;
+}
+
+.Complete-Key {
+  /* font-weight: bold; */
+  font-size: 18px;
+}
+
+.Complete-Val {
+  color: #111827;
+  font-weight: 600;
+}

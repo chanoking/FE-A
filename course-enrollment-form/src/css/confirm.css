@@ -24,6 +24,7 @@
   border: 1px solid #ccc;
   border-radius: 3px;
   background-color: white;
+  overflow-y: auto;
 }
 
 .apply-terms-header {
@@ -48,6 +49,31 @@
   margin-top: 20px;
 }
 
+.apply-terms-part {
+  width: 100%;
+  border: 1px solid #ccc;
+  padding: 10px 20px;
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.apply-terms-part-title {
+  font-weight: 700;
+  font-size: 18.5px;
+  margin-bottom: 5px;
+  float: left;
+}
+
+.apply-terms-part-item {
+  font-weight: 500;
+  font-size: 14.5px;
+}
+
+.closing-phrase {
+  font-size: 14px;
+}
 .close-terms {
   position: absolute;
   top: 5px;
@@ -135,6 +161,17 @@
   margin-top: 12px;
 }
 
+.detail {
+  padding: 5px 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.detail-p {
+  font-size: 13px;
+}
+
 .confirm-reason {
   margin: 10px 0 0;
   padding: 14px;
@@ -158,6 +195,17 @@
   border-radius: 10px;
   border: none;
   font-weight: 700;
+  cursor: pointer;
+}
+
+.confirm-btn {
+  width: 50px;
+  height: 30px;
+  background: #22c55e;
+  border: 1px solid #ccc;
+  color: white;
+  border-radius: 3px;
+  font-weight: 500;
   cursor: pointer;
 }
 
@@ -188,4 +236,40 @@
 
 .agreement {
   border-bottom: 1px solid #edf0f3;
+}
+
+.confrim-toast-area {
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  position: absolute;
+}
+
+.confirm-toast-error {
+  padding: 12px 24px;
+  border-radius: 5px;
+  border: none;
+  background-color: #ffe4e6;
+  color: #e11d48;
+  animation: toastFade 2.5 ease forwards;
+}
+
+@keyframes toastFade {
+  0% {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  15% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  75% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+  }
 }

@@ -11,14 +11,25 @@ export default function Courses() {
   const [courses, setCourses] = useState<Course[]>([]);
   const [personalActive, setPersonalActive] = useState<boolean>(true);
   const [groupActive, setGroupActive] = useState<boolean>(false);
+  const [pages, setPages] = useState(1);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const navigate = useNavigate();
 
   const filteredCourses = useMemo(() => {
-    if (selectedCategory === "전체") return courses;
+    const start = (currentPage - 1) * 19;
+    const end = start + 20;
 
-    return courses.filter((course) => course.category === selectedCategory);
-  }, [courses, selectedCategory]);
+    if (selectedCategory === "전체") return courses.slice(start, end);
+
+    const filtered = courses.filter(
+      (course) => course.category === selectedCategory
+    );
+
+    const sliced = filtered.slice(start, end);
+
+    return sliced;
+  }, [courses, selectedCategory, currentPage]);
 
   const clickCategory = (category: string) => {
     setSelectedCategory(category);
@@ -31,12 +42,14 @@ export default function Courses() {
 
       setCategories(data.categories);
       setCourses(data.courses);
+      setPages(Math.ceil(data.courses.length / 20));
     };
     fetchCourses();
   }, []);
 
-  const calDates = (startDate, endDate) => {
-    const diff = new Date(endDate) - new Date(startDate);
+  const calDates = (startDate: string, endDate: string) => {
+    const diff = new Date(endDate).getTime() - new Date(startDate).getTime();
+
     const diffDays = Math.floor(diff / (24 * 60 * 60 * 1000));
 
     return diffDays;
@@ -128,6 +141,9 @@ export default function Courses() {
               <button
                 className="register-btn"
                 onClick={() => {
+                  if (course.currentEnrollment === course.maxCapacity) {
+                    return alert("가득 찼습니다.");
+                  }
                   personalActive
                     ? navigate("/enrollment-personal", { state: { course } })
                     : navigate("/enrollment-group");
@@ -138,6 +154,39 @@ export default function Courses() {
             </div>
           </div>
         ))}
+      </div>
+
+      <div className="courses-footer">
+        <div className="courses-pages">
+          <div
+            className="page-number"
+            onClick={() => {
+              if (currentPage === 1) return;
+
+              setCurrentPage((prev) => prev - 1);
+            }}
+          >
+            ⟨
+          </div>
+          {Array.from({ length: pages }, (_, i) => i + 1).map((i) => (
+            <div
+              className={`page-number ${currentPage === i ? "active" : ""}`}
+              onClick={() => setCurrentPage(i)}
+            >
+              {i}
+            </div>
+          ))}
+          <div
+            className="page-number"
+            onClick={() => {
+              if (currentPage === pages) return;
+
+              setCurrentPage((prev) => prev + 1);
+            }}
+          >
+            ⟩
+          </div>
+        </div>
       </div>
     </div>
   );
