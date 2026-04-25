@@ -20,11 +20,17 @@ export default function Courses() {
     const start = (currentPage - 1) * 19;
     const end = start + 20;
 
-    if (selectedCategory === "전체") return courses.slice(start, end);
+    if (selectedCategory === "전체") {
+      setPages(Math.ceil(courses.length / 20));
+
+      return courses.slice(start, end);
+    }
 
     const filtered = courses.filter(
       (course) => course.category === selectedCategory
     );
+
+    setPages(Math.ceil(filtered.length / 20));
 
     const sliced = filtered.slice(start, end);
 
@@ -42,7 +48,6 @@ export default function Courses() {
 
       setCategories(data.categories);
       setCourses(data.courses);
-      setPages(Math.ceil(data.courses.length / 20));
     };
     fetchCourses();
   }, []);
@@ -66,6 +71,7 @@ export default function Courses() {
             key={idx}
             onClick={() => {
               clickCategory(category);
+              setCurrentPage(1);
             }}
           >
             <div className="category-img">{ctgImgs[idx]}</div>
