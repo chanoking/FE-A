@@ -17,22 +17,37 @@ export default function GroupRegistrationForm() {
   const [phone, setPhone] = useState(!info ? "" : info.phone);
   const [reason, setReason] = useState(!info ? "" : info.reason);
   const [groupName, setGroupName] = useState(!info ? "" : info.groupName);
+  const [representativePhoneNumber, setRepresentativePhoneNumber] = useState(
+    !info ? "" : info.representativePhoneNumber
+  );
+  const [participants, setParticipants] = useState<Map<string, Participant>>(
+    !info
+      ? new Map()
+      : new Map(
+          info?.participants.map((participant) => [
+            participant.email,
+            participant,
+          ])
+        )
+  );
 
   const [touchedOutsideName, setTouchedOutsideName] = useState(false);
   const [touchedOutsideEmail, setTouchedOutsideEmail] = useState(false);
   const [touchedOutsidePhone, setTouchedOutsidePhone] = useState(false);
   const [touchedOutsideGroup, setTouchedOutsideGroup] = useState(false);
+  const [
+    touchedOutsideRepresentativePhoneNumber,
+    setTouchedOutsideRepresentativePhoneNumber,
+  ] = useState(false);
 
   const [textCnt, setTextCnt] = useState(0);
-  const [participants, setParticipants] = useState<Map<string, Participant>>(
-    new Map()
-  );
   const [addName, setAddName] = useState("");
   const [addEmail, setAddEmail] = useState("");
 
   const [emailError, setEmailError] = useState(false);
   const [emailDuplicateError, setEmailDuplicateError] = useState(false);
   const [emptyError, setEmptyError] = useState(false);
+  const [sizeError, setSizeError] = useState(false);
 
   const [showSubmitError, setShowSubmitError] = useState(false);
 
@@ -49,13 +64,12 @@ export default function GroupRegistrationForm() {
       !email.trim() ||
       !emailValidation(email) ||
       !phone.trim() ||
-      !validPhoneNumber(phone);
+      !validPhoneNumber(phone) ||
+      !representativePhoneNumber.trim() ||
+      !validPhoneNumber(representativePhoneNumber) ||
+      participants.size < 2;
 
     if (hasError) {
-      setTouchedOutsideName(true);
-      setTouchedOutsideEmail(true);
-      setTouchedOutsidePhone(true);
-
       setShowSubmitError(true);
 
       setTimeout(() => {
@@ -72,6 +86,8 @@ export default function GroupRegistrationForm() {
           email,
           phone,
           reason,
+          representativePhoneNumber,
+          participants: Array.from(participants.values()),
         },
         course,
       },
@@ -85,32 +101,44 @@ export default function GroupRegistrationForm() {
       setEmptyError(true);
       setEmailError(false);
       setEmailDuplicateError(false);
+      setSizeError(false);
       return;
     }
+
+    if (participants.size === 10) {
+      setSizeError(true);
+      setEmailError(false);
+      setEmptyError(false);
+      setEmailDuplicateError(false);
+      return;
+    }
+
     if (!emailRegex.test(addEmail)) {
       setEmailError(true);
       setEmptyError(false);
       setEmailDuplicateError(false);
+      setSizeError(false);
       return;
     }
 
     if (participants.has(addEmail)) {
       setEmailDuplicateError(true);
       setEmptyError(false);
+      setSizeError(false);
       setEmailError(false);
       return;
     }
-    if (emailRegex.test(addEmail) && !participants.has(addEmail)) {
-      setParticipants((prev) =>
-        prev.set(addEmail, { name: addName, email: addEmail })
-      );
-      setAddEmail("");
-      setAddName("");
-      setEmailDuplicateError(false);
-      setEmailError(false);
-      setEmptyError(false);
-    }
+    setParticipants((prev) =>
+      prev.set(addEmail, { email: addEmail, name: addName })
+    );
+    setAddEmail("");
+    setAddName("");
+    setEmailDuplicateError(false);
+    setEmailError(false);
+    setEmptyError(false);
+    setSizeError(false);
   };
+
   const emailValidation = (email: string) => {
     if (!email) return true;
 
@@ -123,6 +151,12 @@ export default function GroupRegistrationForm() {
     const onlyNumber = e.target.value?.replace(/\D/g, "") || "";
 
     setPhone(onlyNumber);
+  };
+
+  const handleChangeB = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const onlyNumber = e.target.value?.replace(/\D/g, "") || "";
+
+    setRepresentativePhoneNumber(onlyNumber);
   };
 
   const validPhoneNumber = (number: string) => {
@@ -184,8 +218,75 @@ export default function GroupRegistrationForm() {
                   setTouchedOutsideName(true);
                 }}
               />
-              {touchedOutsideName && (
+              {touchedOutsideName && !name && (
                 <p className="error">필수 응답 항목입니다.</p>
+              )}
+            </div>
+          </div>
+        </div>
+
+        <div className="apply-form">
+          <div className="form-field">
+            <div className="form-label-row">
+              <div className="form-label">이메일</div>
+              <div className="form-required">·</div>
+            </div>
+
+            <div className="form-input-wrapper">
+              <input
+                type="email"
+                className="form-input"
+                placeholder="example@domain.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                onBlur={() => {
+                  if (email && emailValidation(email)) {
+                    setTouchedOutsideEmail(false);
+                    return;
+                  }
+                  setTouchedOutsideEmail(true);
+                }}
+              />
+
+              {touchedOutsideEmail && !emailValidation(email) && (
+                <p className="error">이메일 형식이 올바르지 않습니다.</p>
+              )}
+              {touchedOutsideEmail && !email && (
+                <p className="error">필수 응답 항목입니다.</p>
+              )}
+            </div>
+          </div>
+        </div>
+
+        <div className="apply-form">
+          <div className="form-field">
+            <div className="form-label-row">
+              <div className="form-label">연락처</div>
+              <div className="form-required">·</div>
+            </div>
+
+            <div className="form-input-wrapper">
+              <input
+                type="text"
+                className="form-input"
+                placeholder="01012345678"
+                value={phone}
+                onChange={(e) => handleChange(e)}
+                onBlur={() => {
+                  if (phone && validPhoneNumber(phone)) {
+                    setTouchedOutsidePhone(false);
+                    return;
+                  }
+                  setTouchedOutsidePhone(true);
+                }}
+              />
+
+              {touchedOutsidePhone && !phone && (
+                <p className="error">필수 응답 항목입니다.</p>
+              )}
+
+              {touchedOutsidePhone && !validPhoneNumber(phone) && (
+                <p className="error">전화번호 인증을 완료해 주세요.</p>
               )}
             </div>
           </div>
@@ -226,7 +327,10 @@ export default function GroupRegistrationForm() {
         <div className="apply-form">
           <div className="form-field">
             <div className="form-label-row">
-              <div className="form-label">신청 인원수</div>
+              <span className="form-label">신청 인원수</span>
+              <span className="description">
+                (최소 2명, 최대 10명까지 등록가능합니다.)
+              </span>
             </div>
 
             <div className="add-participant">
@@ -245,7 +349,7 @@ export default function GroupRegistrationForm() {
                 className="email-name"
                 value={addEmail}
                 onChange={(e) => setAddEmail(e.target.value)}
-                placeholder="example@domain.com"
+                placeholder="example2@domain.com"
               />
               <button className="addBtn" onClick={handleAddBtn}>
                 추가하기
@@ -256,9 +360,13 @@ export default function GroupRegistrationForm() {
                 </div>
               ) : emailDuplicateError ? (
                 <div className="error-message">이메일이 중복되었습니다.</div>
+              ) : sizeError ? (
+                <div className="error-message">
+                  최대 10명까지 등록 가능합니다.
+                </div>
               ) : (
                 <div className="error-message">
-                  이메일과 이름은 필수값입니다.
+                  이름과 이메일은 필수값입니다.
                 </div>
               )}
             </div>
@@ -274,18 +382,21 @@ export default function GroupRegistrationForm() {
             <div className="form-input-wrapper">
               <ol className="participants">
                 {Array.from(participants).map(([key, val]) => (
-                  <div className="bundle" key={key}>
-                    <li className="addedInfo">{`${val.name}(${val.email})`}</li>
+                  <li className="bundle" key={key}>
+                    <span className="addedInfo">{`${val.name}(${val.email})`}</span>
                     <div
                       className="delete"
                       onClick={() => {
-                        participants.delete(key);
-                        setParticipants((prev) => new Map(Array.from(prev)));
+                        setParticipants((prev) => {
+                          const next = new Map(prev);
+                          next.delete(key);
+                          return next;
+                        });
                       }}
                     >
                       x
                     </div>
-                  </div>
+                  </li>
                 ))}
               </ol>
             </div>
@@ -314,6 +425,45 @@ export default function GroupRegistrationForm() {
                 <span className="display-cnt">{textCnt}</span>
                 <span className="max-cnt"> / 300</span>
               </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="apply-form">
+          <div className="form-field">
+            <div className="form-label-row">
+              <div className="form-label">담당자 연락처</div>
+              <div className="form-required">·</div>
+            </div>
+
+            <div className="form-input-wrapper">
+              <input
+                type="text"
+                className="form-input"
+                placeholder="01012345678"
+                value={representativePhoneNumber}
+                onChange={(e) => handleChangeB(e)}
+                onBlur={() => {
+                  if (
+                    representativePhoneNumber &&
+                    validPhoneNumber(representativePhoneNumber)
+                  ) {
+                    setTouchedOutsideRepresentativePhoneNumber(false);
+                    return;
+                  }
+                  setTouchedOutsideRepresentativePhoneNumber(true);
+                }}
+              />
+
+              {touchedOutsideRepresentativePhoneNumber &&
+                !representativePhoneNumber && (
+                  <p className="error">필수 응답 항목입니다.</p>
+                )}
+
+              {touchedOutsideRepresentativePhoneNumber &&
+                !validPhoneNumber(representativePhoneNumber) && (
+                  <p className="error">전화번호 인증을 완료해 주세요.</p>
+                )}
             </div>
           </div>
         </div>

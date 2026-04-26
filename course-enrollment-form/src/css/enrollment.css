@@ -81,6 +81,12 @@
   font-weight: 700;
 }
 
+.description {
+  font-weight: 600;
+  font-size: 14px;
+  color: #71717b;
+}
+
 .form-required {
   padding-bottom: 10px;
   font-size: 25px;
@@ -178,6 +184,7 @@
 .email-name {
   border: none;
   padding: 10px;
+  width: 163px;
 }
 
 .email-name:hover {

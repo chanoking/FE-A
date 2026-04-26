@@ -15,10 +15,9 @@ export default function Confirm() {
 
   const { course, info } = location.state ?? {};
 
-  const terms = [
-    "수강신청은 신청서 작성 및 결제 완료시 최종 확정됩니다",
-    "결제 완료 후에는 별도의 취소 요청이 없는 한 자동으로 수강이 시작됩니다",
-  ];
+  const [option, setOption] = useState(
+    info.representativePhoneNumber ? "group" : "personal"
+  );
 
   useEffect(() => {
     if (applyAgreement && privacyAgreement) {
@@ -68,6 +67,10 @@ export default function Confirm() {
               {course.price?.toLocaleString()}원
             </span>
           </div>
+        </section>
+
+        <section className="confirm-section">
+          <h2 className="confirm-section-title">신청 인원</h2>
         </section>
 
         <section className="confirm-section">
