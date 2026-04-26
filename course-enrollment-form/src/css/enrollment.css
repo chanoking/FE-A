@@ -138,6 +138,11 @@
   cursor: pointer;
 }
 
+.delete:hover {
+  background-color: #71717b;
+  color: aliceblue;
+}
+
 .box {
   flex: 0 0 38px;
   padding: 3px;

@@ -276,7 +276,15 @@ export default function GroupRegistrationForm() {
                 {Array.from(participants).map(([key, val]) => (
                   <div className="bundle" key={key}>
                     <li className="addedInfo">{`${val.name}(${val.email})`}</li>
-                    <div className="delete">x</div>
+                    <div
+                      className="delete"
+                      onClick={() => {
+                        participants.delete(key);
+                        setParticipants((prev) => new Map(Array.from(prev)));
+                      }}
+                    >
+                      x
+                    </div>
                   </div>
                 ))}
               </ol>
