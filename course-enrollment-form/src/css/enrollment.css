@@ -153,6 +153,11 @@
   gap: 10px;
 }
 
+.error-message {
+  color: #f2584e;
+  font-size: 14px;
+}
+
 .addBtn {
   border: none;
   background-color: #71717b;

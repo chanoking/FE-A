@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import "../css/enrollment.css";
 import type { Course } from "../types/course";
 import type { Info } from "../types/info";
+import type { Participant } from "../types/participant";
 
 export default function GroupRegistrationForm() {
   const location = useLocation();
@@ -23,9 +24,15 @@ export default function GroupRegistrationForm() {
   const [touchedOutsideGroup, setTouchedOutsideGroup] = useState(false);
 
   const [textCnt, setTextCnt] = useState(0);
-  const [participants, setParticipants] = useState([]);
+  const [participants, setParticipants] = useState<Map<string, Participant>>(
+    new Map()
+  );
   const [addName, setAddName] = useState("");
   const [addEmail, setAddEmail] = useState("");
+
+  const [emailError, setEmailError] = useState(false);
+  const [emailDuplicateError, setEmailDuplicateError] = useState(false);
+  const [emptyError, setEmptyError] = useState(false);
 
   const [showSubmitError, setShowSubmitError] = useState(false);
 
@@ -71,6 +78,39 @@ export default function GroupRegistrationForm() {
     });
   };
 
+  const handleAddBtn = () => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!addEmail || !addName) {
+      setEmptyError(true);
+      setEmailError(false);
+      setEmailDuplicateError(false);
+      return;
+    }
+    if (!emailRegex.test(addEmail)) {
+      setEmailError(true);
+      setEmptyError(false);
+      setEmailDuplicateError(false);
+      return;
+    }
+
+    if (participants.has(addEmail)) {
+      setEmailDuplicateError(true);
+      setEmptyError(false);
+      setEmailError(false);
+      return;
+    }
+    if (emailRegex.test(addEmail) && !participants.has(addEmail)) {
+      setParticipants((prev) =>
+        prev.set(addEmail, { name: addName, email: addEmail })
+      );
+      setAddEmail("");
+      setAddName("");
+      setEmailDuplicateError(false);
+      setEmailError(false);
+      setEmptyError(false);
+    }
+  };
   const emailValidation = (email: string) => {
     if (!email) return true;
 
@@ -190,7 +230,7 @@ export default function GroupRegistrationForm() {
             </div>
 
             <div className="add-participant">
-              <div className="box">{participants.length}</div>
+              <div className="box">{participants.size}</div>
             </div>
             <div className="email-name-layout">
               <input
@@ -207,19 +247,20 @@ export default function GroupRegistrationForm() {
                 onChange={(e) => setAddEmail(e.target.value)}
                 placeholder="example@domain.com"
               />
-              <button
-                className="addBtn"
-                onClick={() => {
-                  setParticipants((prev) => [
-                    ...prev,
-                    { email: addEmail, name: addName },
-                  ]);
-                  setAddEmail("");
-                  setAddName("");
-                }}
-              >
+              <button className="addBtn" onClick={handleAddBtn}>
                 추가하기
               </button>
+              {emailError ? (
+                <div className="error-message">
+                  이메일 형식이 올바르지 않습니다.
+                </div>
+              ) : emailDuplicateError ? (
+                <div className="error-message">이메일이 중복되었습니다.</div>
+              ) : (
+                <div className="error-message">
+                  이메일과 이름은 필수값입니다.
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -232,9 +273,9 @@ export default function GroupRegistrationForm() {
 
             <div className="form-input-wrapper">
               <ol className="participants">
-                {participants.map((p, idx) => (
-                  <div className="bundle" key={idx}>
-                    <li className="addedInfo">{`${p.name}(${p.email})`}</li>
+                {Array.from(participants).map(([key, val]) => (
+                  <div className="bundle" key={key}>
+                    <li className="addedInfo">{`${val.name}(${val.email})`}</li>
                     <div className="delete">x</div>
                   </div>
                 ))}
