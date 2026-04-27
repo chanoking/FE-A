@@ -1,13 +1,16 @@
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import "../css/complete.css";
 import type { Course } from "../types/course";
 import type { Info } from "../types/info";
 
 export default function Complete() {
   const location = useLocation();
+  const navigate = useNavigate();
+
   const { course, info } =
     (location.state as { course?: Course; info?: Info }) ?? {};
   const currentDate = new Date().toISOString();
+  const option = info?.representativePhoneNumber ? "group" : "personal";
 
   const createApplicationNo = () => {
     const date = new Date();
@@ -45,7 +48,7 @@ export default function Complete() {
             <div className="Complete-Registration-Row">
               <span className="Complete-Key">결제금액</span>
               <span className="Complete-Val">
-                {course.price.toLocaleString()}
+                {option === "personal" ? course.price.toLocaleString() : (course?.price * info?.participants.length).toLocaleString()}
               </span>
             </div>
 
@@ -54,6 +57,10 @@ export default function Complete() {
               <span className="Complete-Val">{currentDate}</span>
             </div>
           </div>
+        </div>
+
+        <div className="guide">
+          <button className="backhome" onClick={() => navigate("/courses")}>처음으로 돌아가기</button>
         </div>
       </div>
     </div>

@@ -17,7 +17,7 @@ export default function Courses() {
   const navigate = useNavigate();
 
   const filteredCourses = useMemo(() => {
-    const start = (currentPage - 1) * 19;
+    const start = (currentPage - 1) * 20;
     const end = start + 20;
 
     if (selectedCategory === "전체") {
@@ -43,7 +43,7 @@ export default function Courses() {
 
   useEffect(() => {
     const fetchCourses = async () => {
-      const res = await fetch("http://localhost:5175/courses");
+      const res = await fetch("http://localhost:5173/courses");
       const data: CourseListResponse = await res.json();
 
       setCategories(data.categories);
@@ -80,7 +80,7 @@ export default function Courses() {
                 selectedCategory === category ? "active" : ""
               }`}
             >
-              {category}∫
+              {category}
             </div>
           </div>
         ))}

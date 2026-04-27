@@ -1,9 +1,19 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useForm } from "react-hook-form";
 import "../css/enrollment.css";
 import type { Course } from "../types/course";
 import type { Info } from "../types/info";
 import type { Participant } from "../types/participant";
+
+type GroupFormValues = {
+  name: string;
+  email: string;
+  phone: string;
+  reason: string;
+  groupName: string;
+  representativePhoneNumber: string;
+};
 
 export default function GroupRegistrationForm() {
   const location = useLocation();
@@ -12,35 +22,17 @@ export default function GroupRegistrationForm() {
   const { course, info } =
     (location.state as { course?: Course; info?: Info }) ?? {};
 
-  const [name, setName] = useState(!info ? "" : info.name);
-  const [email, setEmail] = useState(!info ? "" : info.email);
-  const [phone, setPhone] = useState(!info ? "" : info.phone);
-  const [reason, setReason] = useState(!info ? "" : info.reason);
-  const [groupName, setGroupName] = useState(!info ? "" : info.groupName);
-  const [representativePhoneNumber, setRepresentativePhoneNumber] = useState(
-    !info ? "" : info.representativePhoneNumber
-  );
   const [participants, setParticipants] = useState<Map<string, Participant>>(
     !info
       ? new Map()
       : new Map(
-          info?.participants.map((participant) => [
+          info.participants?.map((participant) => [
             participant.email,
             participant,
           ])
         )
   );
 
-  const [touchedOutsideName, setTouchedOutsideName] = useState(false);
-  const [touchedOutsideEmail, setTouchedOutsideEmail] = useState(false);
-  const [touchedOutsidePhone, setTouchedOutsidePhone] = useState(false);
-  const [touchedOutsideGroup, setTouchedOutsideGroup] = useState(false);
-  const [
-    touchedOutsideRepresentativePhoneNumber,
-    setTouchedOutsideRepresentativePhoneNumber,
-  ] = useState(false);
-
-  const [textCnt, setTextCnt] = useState(0);
   const [addName, setAddName] = useState("");
   const [addEmail, setAddEmail] = useState("");
 
@@ -51,6 +43,28 @@ export default function GroupRegistrationForm() {
 
   const [showSubmitError, setShowSubmitError] = useState(false);
 
+  const {
+    register,
+    handleSubmit,
+    watch,
+    setValue,
+    setError,
+    clearErrors,
+    formState: { errors },
+  } = useForm<GroupFormValues>({
+    mode: "onBlur",
+    defaultValues: {
+      name: info?.name ?? "",
+      email: info?.email ?? "",
+      phone: info?.phone ?? "",
+      reason: info?.reason ?? "",
+      groupName: info?.groupName ?? "",
+      representativePhoneNumber: info?.representativePhoneNumber ?? "",
+    },
+  });
+
+  const reason = watch("reason") ?? "";
+
   if (!course) {
     return <div style={{ userSelect: "none" }}>잘못된 접근입니다.</div>;
   }
@@ -58,18 +72,8 @@ export default function GroupRegistrationForm() {
   const deadline = "마감: ";
   const possibleSeat = "가능인원: ";
 
-  const handleSubmit = () => {
-    const hasError =
-      !name.trim() ||
-      !email.trim() ||
-      !emailValidation(email) ||
-      !phone.trim() ||
-      !validPhoneNumber(phone) ||
-      !representativePhoneNumber.trim() ||
-      !validPhoneNumber(representativePhoneNumber) ||
-      participants.size < 2;
-
-    if (hasError) {
+  const onSubmit = (data: GroupFormValues) => {
+    if (participants.size < 2) {
       setShowSubmitError(true);
 
       setTimeout(() => {
@@ -82,11 +86,7 @@ export default function GroupRegistrationForm() {
     navigate("/confirm", {
       state: {
         info: {
-          name,
-          email,
-          phone,
-          reason,
-          representativePhoneNumber,
+          ...data,
           participants: Array.from(participants.values()),
         },
         course,
@@ -94,10 +94,18 @@ export default function GroupRegistrationForm() {
     });
   };
 
+  const onInvalid = () => {
+    setShowSubmitError(true);
+
+    setTimeout(() => {
+      setShowSubmitError(false);
+    }, 2500);
+  };
+
   const handleAddBtn = () => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-    if (!addEmail || !addName) {
+    if (!addEmail.trim() || !addName.trim()) {
       setEmptyError(true);
       setEmailError(false);
       setEmailDuplicateError(false);
@@ -128,41 +136,19 @@ export default function GroupRegistrationForm() {
       setEmailError(false);
       return;
     }
-    setParticipants((prev) =>
-      prev.set(addEmail, { email: addEmail, name: addName })
-    );
+
+    setParticipants((prev) => {
+      const next = new Map(prev);
+      next.set(addEmail, { email: addEmail, name: addName });
+      return next;
+    });
+
     setAddEmail("");
     setAddName("");
     setEmailDuplicateError(false);
     setEmailError(false);
     setEmptyError(false);
     setSizeError(false);
-  };
-
-  const emailValidation = (email: string) => {
-    if (!email) return true;
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-    return emailRegex.test(email);
-  };
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const onlyNumber = e.target.value?.replace(/\D/g, "") || "";
-
-    setPhone(onlyNumber);
-  };
-
-  const handleChangeB = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const onlyNumber = e.target.value?.replace(/\D/g, "") || "";
-
-    setRepresentativePhoneNumber(onlyNumber);
-  };
-
-  const validPhoneNumber = (number: string) => {
-    if (!number) return true;
-
-    return /^010\d{8}$/.test(number);
   };
 
   const formatDate = (dateString: string) => {
@@ -205,22 +191,22 @@ export default function GroupRegistrationForm() {
               <input
                 type="text"
                 maxLength={20}
-                minLength={2}
                 className="form-input"
                 placeholder="내용을 입력해주세요."
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                onBlur={() => {
-                  if (name) {
-                    setTouchedOutsideName(false);
-                    return;
+                {...register("name", {
+                  required: "필수 응답 항목입니다.",
+                  minLength: {
+                    value: 2,
+                    message: "신청자는 2자 이상 입력해주세요.",
+                  },
+                  maxLength: {
+                    value: 10,
+                    message: "10자까지 입력 가능합니다."
                   }
-                  setTouchedOutsideName(true);
-                }}
+                })}
               />
-              {touchedOutsideName && !name && (
-                <p className="error">필수 응답 항목입니다.</p>
-              )}
+
+              {errors.name && <p className="error">{errors.name.message}</p>}
             </div>
           </div>
         </div>
@@ -237,23 +223,16 @@ export default function GroupRegistrationForm() {
                 type="email"
                 className="form-input"
                 placeholder="example@domain.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                onBlur={() => {
-                  if (email && emailValidation(email)) {
-                    setTouchedOutsideEmail(false);
-                    return;
-                  }
-                  setTouchedOutsideEmail(true);
-                }}
+                {...register("email", {
+                  required: "필수 응답 항목입니다.",
+                  pattern: {
+                    value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                    message: "이메일 형식이 올바르지 않습니다.",
+                  },
+                })}
               />
 
-              {touchedOutsideEmail && !emailValidation(email) && (
-                <p className="error">이메일 형식이 올바르지 않습니다.</p>
-              )}
-              {touchedOutsideEmail && !email && (
-                <p className="error">필수 응답 항목입니다.</p>
-              )}
+              {errors.email && <p className="error">{errors.email.message}</p>}
             </div>
           </div>
         </div>
@@ -270,24 +249,22 @@ export default function GroupRegistrationForm() {
                 type="text"
                 className="form-input"
                 placeholder="01012345678"
-                value={phone}
-                onChange={(e) => handleChange(e)}
-                onBlur={() => {
-                  if (phone && validPhoneNumber(phone)) {
-                    setTouchedOutsidePhone(false);
-                    return;
-                  }
-                  setTouchedOutsidePhone(true);
-                }}
+                {...register("phone", {
+                  required: "필수 응답 항목입니다.",
+                  pattern: {
+                    value: /^010\d{8}$/,
+                    message: "전화번호 형식이 올바르지 않습니다.",
+                  },
+                  onChange: (e) => {
+                    const onlyNumber = e.target.value.replace(/\D/g, "");
+                    setValue("phone", onlyNumber, {
+                      shouldValidate: true,
+                    });
+                  },
+                })}
               />
 
-              {touchedOutsidePhone && !phone && (
-                <p className="error">필수 응답 항목입니다.</p>
-              )}
-
-              {touchedOutsidePhone && !validPhoneNumber(phone) && (
-                <p className="error">전화번호 인증을 완료해 주세요.</p>
-              )}
+              {errors.phone && <p className="error">{errors.phone.message}</p>}
             </div>
           </div>
         </div>
@@ -303,22 +280,19 @@ export default function GroupRegistrationForm() {
               <input
                 type="text"
                 maxLength={20}
-                minLength={2}
                 className="form-input"
                 placeholder="내용을 입력해주세요."
-                value={groupName}
-                onChange={(e) => setGroupName(e.target.value)}
-                onBlur={() => {
-                  if (groupName) {
-                    setTouchedOutsideGroup(false);
-                    return;
-                  }
-                  setTouchedOutsideGroup(true);
-                }}
+                {...register("groupName", {
+                  required: "필수 응답 항목입니다.",
+                  minLength: {
+                    value: 2,
+                    message: "단체명은 2자 이상 입력해주세요.",
+                  },
+                })}
               />
 
-              {touchedOutsideGroup && !email && (
-                <p className="error">필수 응답 항목입니다.</p>
+              {errors.groupName && (
+                <p className="error">{errors.groupName.message}</p>
               )}
             </div>
           </div>
@@ -336,6 +310,7 @@ export default function GroupRegistrationForm() {
             <div className="add-participant">
               <div className="box">{participants.size}</div>
             </div>
+
             <div className="email-name-layout">
               <input
                 className="email-name"
@@ -345,15 +320,18 @@ export default function GroupRegistrationForm() {
                 onChange={(e) => setAddName(e.target.value)}
                 placeholder="이름"
               />
+
               <input
                 className="email-name"
                 value={addEmail}
                 onChange={(e) => setAddEmail(e.target.value)}
                 placeholder="example2@domain.com"
               />
-              <button className="addBtn" onClick={handleAddBtn}>
+
+              <button type="button" className="addBtn" onClick={handleAddBtn}>
                 추가하기
               </button>
+
               {emailError ? (
                 <div className="error-message">
                   이메일 형식이 올바르지 않습니다.
@@ -364,11 +342,11 @@ export default function GroupRegistrationForm() {
                 <div className="error-message">
                   최대 10명까지 등록 가능합니다.
                 </div>
-              ) : (
+              ) : emptyError ? (
                 <div className="error-message">
                   이름과 이메일은 필수값입니다.
                 </div>
-              )}
+              ) : null}
             </div>
           </div>
         </div>
@@ -383,7 +361,10 @@ export default function GroupRegistrationForm() {
               <ol className="participants">
                 {Array.from(participants).map(([key, val]) => (
                   <li className="bundle" key={key}>
-                    <span className="addedInfo">{`${val.name}(${val.email})`}</span>
+                    <span className="addedInfo">
+                      {`${val.name}(${val.email})`}
+                    </span>
+
                     <div
                       className="delete"
                       onClick={() => {
@@ -399,6 +380,10 @@ export default function GroupRegistrationForm() {
                   </li>
                 ))}
               </ol>
+
+              {participants.size > 0 && participants.size < 2 && (
+                <p className="error">참가자는 최소 2명 이상 등록해주세요.</p>
+              )}
             </div>
           </div>
         </div>
@@ -414,15 +399,11 @@ export default function GroupRegistrationForm() {
                 className="form-input reason"
                 maxLength={300}
                 placeholder="지원동기를 입력해주세요."
-                value={reason}
-                onChange={(e) => {
-                  const value = e.target.value;
-                  setReason(value);
-                  setTextCnt(value.length);
-                }}
+                {...register("reason")}
               />
+
               <div className="countChars">
-                <span className="display-cnt">{textCnt}</span>
+                <span className="display-cnt">{reason.length}</span>
                 <span className="max-cnt"> / 300</span>
               </div>
             </div>
@@ -441,29 +422,26 @@ export default function GroupRegistrationForm() {
                 type="text"
                 className="form-input"
                 placeholder="01012345678"
-                value={representativePhoneNumber}
-                onChange={(e) => handleChangeB(e)}
-                onBlur={() => {
-                  if (
-                    representativePhoneNumber &&
-                    validPhoneNumber(representativePhoneNumber)
-                  ) {
-                    setTouchedOutsideRepresentativePhoneNumber(false);
-                    return;
-                  }
-                  setTouchedOutsideRepresentativePhoneNumber(true);
-                }}
+                {...register("representativePhoneNumber", {
+                  required: "필수 응답 항목입니다.",
+                  pattern: {
+                    value: /^010\d{8}$/,
+                    message: "전화번호 형식이 올바르지 않습니다.",
+                  },
+                  onChange: (e) => {
+                    const onlyNumber = e.target.value.replace(/\D/g, "");
+                    setValue("representativePhoneNumber", onlyNumber, {
+                      shouldValidate: true,
+                    });
+                  },
+                })}
               />
 
-              {touchedOutsideRepresentativePhoneNumber &&
-                !representativePhoneNumber && (
-                  <p className="error">필수 응답 항목입니다.</p>
-                )}
-
-              {touchedOutsideRepresentativePhoneNumber &&
-                !validPhoneNumber(representativePhoneNumber) && (
-                  <p className="error">전화번호 인증을 완료해 주세요.</p>
-                )}
+              {errors.representativePhoneNumber && (
+                <p className="error">
+                  {errors.representativePhoneNumber.message}
+                </p>
+              )}
             </div>
           </div>
         </div>
@@ -483,7 +461,11 @@ export default function GroupRegistrationForm() {
               </div>
 
               <div className="FooterApply-Btn">
-                <button className="Apply-Btn" onClick={handleSubmit}>
+                <button
+                  type="button"
+                  className="Apply-Btn"
+                  onClick={handleSubmit(onSubmit, onInvalid)}
+                >
                   제출하기
                 </button>
               </div>

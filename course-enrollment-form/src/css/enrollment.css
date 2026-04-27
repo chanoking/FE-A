@@ -30,10 +30,30 @@
   width: 100%;
 }
 
+.added-function {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.transition {
+  flex:1;
+  padding-top: 1.8px;
+  font-size: 14px;
+}
+
 .apply-header-back {
   padding: 0 64px;
   cursor: pointer;
   font-size: 14px;
+}
+
+.transition-to-group {
+  margin-right: 7px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
 }
 
 .apply-header-back-text {
@@ -106,6 +126,9 @@
 
 .addedInfo {
   padding: 3px 2px;
+  font-size: 15px;
+  color: #333333;
+  font-weight: 600;
 }
 
 .form-input-wrapper {
@@ -137,11 +160,13 @@
   width: 20px;
   height: 20px;
   line-height: 20px;
-  margin-top: 5px;
+  margin-top: 6.5px;
   display: flex;
   flex-direction: column;
   justify-content: center;
   cursor: pointer;
+  padding-bottom: 4px;
+  padding-right: 1px;
 }
 
 .delete:hover {

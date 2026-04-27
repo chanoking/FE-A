@@ -7,6 +7,8 @@
   justify-content: center;
   padding: 40px 80px;
   gap: 20px;
+  user-select: none;
+  position: relative;
 }
 
 .Complete-Header {
@@ -65,4 +67,21 @@
 .Complete-Val {
   color: #111827;
   font-weight: 600;
+}
+
+.guide{
+  position: absolute;
+  top: 60%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.backhome {
+  padding: 12px 24px;
+  border-radius: 3px;
+  border: 1px solid #ccc;
+  background-color: #111827;
+  color: white;
+  font-weight: 700;
+  cursor: pointer;
 }

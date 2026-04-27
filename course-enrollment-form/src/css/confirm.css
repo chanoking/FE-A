@@ -133,6 +133,20 @@
   padding: 10px 0;
 }
 
+.applicants {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+.applicant {
+  color: #71717b;
+  font-size: 14px;
+  font-weight: 700;
+}
+
 .confirm-label {
   flex: 0 0 90px;
   font-size: 14px;

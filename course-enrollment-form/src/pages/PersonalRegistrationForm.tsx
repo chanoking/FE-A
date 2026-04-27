@@ -1,8 +1,16 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useForm } from "react-hook-form";
 import "../css/enrollment.css";
 import type { Course } from "../types/course";
 import type { Info } from "../types/info";
+
+type PersonalFormValues = {
+  name: string;
+  email: string;
+  phone: string;
+  reason: string;
+};
 
 export default function PersonalRegistrationForm() {
   const location = useLocation();
@@ -11,18 +19,25 @@ export default function PersonalRegistrationForm() {
   const { course, info } =
     (location.state as { course?: Course; info?: Info }) ?? {};
 
-  const [name, setName] = useState(!info ? "" : info.name);
-  const [email, setEmail] = useState(!info ? "" : info.email);
-  const [phone, setPhone] = useState(!info ? "" : info.phone);
-  const [reason, setReason] = useState(!info ? "" : info.reason);
-
-  const [touchedOutsideName, setTouchedOutsideName] = useState(false);
-  const [touchedOutsideEmail, setTouchedOutsideEmail] = useState(false);
-  const [touchedOutsidePhone, setTouchedOutsidePhone] = useState(false);
-
-  const [textCnt, setTextCnt] = useState(0);
-
   const [showSubmitError, setShowSubmitError] = useState(false);
+
+  const {
+    register,
+    handleSubmit,
+    watch,
+    setValue,
+    formState: { errors, isSubmitted },
+  } = useForm<PersonalFormValues>({
+    mode: "onBlur",
+    defaultValues: {
+      name: info?.name ?? "",
+      email: info?.email ?? "",
+      phone: info?.phone ?? "",
+      reason: info?.reason ?? "",
+    },
+  });
+
+  const reason = watch("reason") ?? "";
 
   if (!course) {
     return <div style={{ userSelect: "none" }}>잘못된 접근입니다.</div>;
@@ -31,59 +46,21 @@ export default function PersonalRegistrationForm() {
   const deadline = "마감: ";
   const possibleSeat = "가능인원: ";
 
-  const handleSubmit = () => {
-    const hasError =
-      !name.trim() ||
-      !email.trim() ||
-      !emailValidation(email) ||
-      !phone.trim() ||
-      !validPhoneNumber(phone);
-
-    if (hasError) {
-      setTouchedOutsideName(true);
-      setTouchedOutsideEmail(true);
-      setTouchedOutsidePhone(true);
-
-      setShowSubmitError(true);
-
-      setTimeout(() => {
-        setShowSubmitError(false);
-      }, 2500);
-
-      return;
-    }
-
+  const onSubmit = (data: PersonalFormValues) => {
     navigate("/confirm", {
       state: {
-        info: {
-          name,
-          email,
-          phone,
-          reason,
-        },
+        info: data,
         course,
       },
     });
   };
 
-  const emailValidation = (email: string) => {
-    if (!email) return true;
+  const onInvalid = () => {
+    setShowSubmitError(true);
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-    return emailRegex.test(email);
-  };
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const onlyNumber = e.target.value?.replace(/\D/g, "") || "";
-
-    setPhone(onlyNumber);
-  };
-
-  const validPhoneNumber = (number: string) => {
-    if (!number) return true;
-
-    return /^010\d{8}$/.test(number);
+    setTimeout(() => {
+      setShowSubmitError(false);
+    }, 2500);
   };
 
   const formatDate = (dateString: string) => {
@@ -102,12 +79,26 @@ export default function PersonalRegistrationForm() {
 
       <div className="apply-layout">
         <div className="apply-header">
-          <div
-            className="apply-header-back"
-            onClick={() => navigate("/courses")}
-          >
-            <span>〈</span>
-            <span className="apply-header-back-text">이전으로</span>
+          <div className="added-function">
+            <div
+              className="apply-header-back"
+              onClick={() => navigate("/courses")}
+            >
+              <span>〈</span>
+              <span className="apply-header-back-text">이전으로</span>
+            </div>
+
+            <div className="transition">
+              <span
+                className="transition-to-group"
+                onClick={() => {
+                  navigate("/enrollment-group", { state: { course } });
+                }}
+              >
+                그룹 신청으로 전환
+              </span>
+              <span>⟩</span>
+            </div>
           </div>
 
           <div className="apply-header-bottom">
@@ -126,22 +117,18 @@ export default function PersonalRegistrationForm() {
               <input
                 type="text"
                 maxLength={20}
-                minLength={2}
                 className="form-input"
                 placeholder="내용을 입력해주세요."
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                onBlur={() => {
-                  if (name) {
-                    setTouchedOutsideName(false);
-                    return;
-                  }
-                  setTouchedOutsideName(true);
-                }}
+                {...register("name", {
+                  required: "필수 응답 항목입니다.",
+                  minLength: {
+                    value: 2,
+                    message: "이름은 2자 이상 입력해주세요.",
+                  },
+                })}
               />
-              {touchedOutsideName && (
-                <p className="error">필수 응답 항목입니다.</p>
-              )}
+
+              {errors.name && <p className="error">{errors.name.message}</p>}
             </div>
           </div>
         </div>
@@ -158,23 +145,16 @@ export default function PersonalRegistrationForm() {
                 type="email"
                 className="form-input"
                 placeholder="example@domain.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                onBlur={() => {
-                  if (email && emailValidation(email)) {
-                    setTouchedOutsideEmail(false);
-                    return;
-                  }
-                  setTouchedOutsideEmail(true);
-                }}
+                {...register("email", {
+                  required: "필수 응답 항목입니다.",
+                  pattern: {
+                    value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                    message: "이메일 형식이 올바르지 않습니다.",
+                  },
+                })}
               />
 
-              {touchedOutsideEmail && !emailValidation(email) && (
-                <p className="error">이메일 형식이 올바르지 않습니다.</p>
-              )}
-              {touchedOutsideEmail && !email && (
-                <p className="error">필수 응답 항목입니다.</p>
-              )}
+              {errors.email && <p className="error">{errors.email.message}</p>}
             </div>
           </div>
         </div>
@@ -191,24 +171,22 @@ export default function PersonalRegistrationForm() {
                 type="text"
                 className="form-input"
                 placeholder="01012345678"
-                value={phone}
-                onChange={(e) => handleChange(e)}
-                onBlur={() => {
-                  if (phone && validPhoneNumber(phone)) {
-                    setTouchedOutsidePhone(false);
-                    return;
-                  }
-                  setTouchedOutsidePhone(true);
-                }}
+                {...register("phone", {
+                  required: "필수 응답 항목입니다.",
+                  pattern: {
+                    value: /^010\d{8}$/,
+                    message: "전화번호 형식이 올바르지 않습니다.",
+                  },
+                  onChange: (e) => {
+                    const onlyNumber = e.target.value.replace(/\D/g, "");
+                    setValue("phone", onlyNumber, {
+                      shouldValidate: true,
+                    });
+                  },
+                })}
               />
 
-              {touchedOutsidePhone && !phone && (
-                <p className="error">필수 응답 항목입니다.</p>
-              )}
-
-              {touchedOutsidePhone && !validPhoneNumber(phone) && (
-                <p className="error">전화번호 인증을 완료해 주세요.</p>
-              )}
+              {errors.phone && <p className="error">{errors.phone.message}</p>}
             </div>
           </div>
         </div>
@@ -224,15 +202,11 @@ export default function PersonalRegistrationForm() {
                 className="form-input reason"
                 maxLength={300}
                 placeholder="지원동기를 입력해주세요."
-                value={reason}
-                onChange={(e) => {
-                  const value = e.target.value;
-                  setReason(value);
-                  setTextCnt(value.length);
-                }}
+                {...register("reason")}
               />
+
               <div className="countChars">
-                <span className="display-cnt">{textCnt}</span>
+                <span className="display-cnt">{reason.length}</span>
                 <span className="max-cnt"> / 300</span>
               </div>
             </div>
@@ -254,7 +228,11 @@ export default function PersonalRegistrationForm() {
               </div>
 
               <div className="FooterApply-Btn">
-                <button className="Apply-Btn" onClick={handleSubmit}>
+                <button
+                  type="button"
+                  className="Apply-Btn"
+                  onClick={handleSubmit(onSubmit, onInvalid)}
+                >
                   제출하기
                 </button>
               </div>

@@ -14,10 +14,8 @@ export default function Confirm() {
   const [showSubmitError, setShowSubmitError] = useState(false);
 
   const { course, info } = location.state ?? {};
+  const option = info.representativePhoneNumber ? "group" : "personal";
 
-  const [option, setOption] = useState(
-    info.representativePhoneNumber ? "group" : "personal"
-  );
 
   useEffect(() => {
     if (applyAgreement && privacyAgreement) {
@@ -48,6 +46,7 @@ export default function Confirm() {
       </header>
 
       <main className="confirm-card">
+
         <section className="confirm-section">
           <h2 className="confirm-section-title">강의 정보</h2>
 
@@ -55,26 +54,22 @@ export default function Confirm() {
             <span className="confirm-label">강의명</span>
             <span className="confirm-value">{course.title}</span>
           </div>
-
           <div className="confirm-row">
             <span className="confirm-label">강사</span>
             <span className="confirm-value">{course.instructor}</span>
           </div>
-
           <div className="confirm-row">
             <span className="confirm-label">수강료</span>
             <span className="confirm-value">
-              {course.price?.toLocaleString()}원
+              {option === "personal" ?
+               course.price?.toLocaleString() : (course.price * info.participants.length).toLocaleString()}원 
+               {` (${course.price.toLocaleString()} x ${info.participants.length})`}
             </span>
           </div>
         </section>
 
         <section className="confirm-section">
-          <h2 className="confirm-section-title">신청 인원</h2>
-        </section>
-
-        <section className="confirm-section">
-          <h2 className="confirm-section-title">지원자 정보</h2>
+          <h2 className="confirm-section-title">신청자 정보</h2>
 
           <div className="confirm-row">
             <span className="confirm-label">이름</span>
@@ -97,6 +92,28 @@ export default function Confirm() {
               {info.reason || "입력된 지원동기가 없습니다."}
             </p>
           </div>
+        </section>
+
+
+        <section className="confirm-section">
+          <h2 className="confirm-section-title">신청 인원</h2>
+          <div className="applicants">
+            {info?.participants.map((participant, i) => (
+              <div key ={i} className="applicant">{participant.name}({participant.email})</div>
+            ))}
+
+          </div>
+        </section>
+
+
+        <section className="confirm-section">
+          <h2 className="confirm-section-title">담당자 정보</h2>
+
+          <div className="confirm-row">
+            <span className="confirm-label">연락처</span>
+            <span className="confirm-value">{info.representativePhoneNumber}</span>
+          </div>
+
         </section>
 
         <section className="confirm-section">
