@@ -5,7 +5,7 @@
 <p>해당 내용은 온라인 강의 신청 폼에 관한 것이며 신청은 개인과 그룹으로 나뉜다. 그룹의 경우 최대 10명까지 등록 가능하며 점진적인 스탭을 밟아가며 최종에 이른다.</p>
 
 <h2>기술 스택</h2>
-<p>React, Vite, typsscript, css, html</p>
+<p>React, Vite, typescript, css, html</p>
 
 <h2>실행방법</h2>
 <p>해당 git url clone 이후 npm install 후 npm run dev를 통해 진행된다.</p>
