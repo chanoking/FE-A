@@ -49,34 +49,34 @@ describe("GroupRegistrationForm", () => {
   });
 
   test("참가자는 최대 10명까지만 추가된다", () => {
-  renderWithState({ course: mockCourse });
+    renderWithState({ course: mockCourse });
 
-  const addButton = screen.getByRole("button", { name: "추가하기" });
+    const addButton = screen.getByRole("button", { name: "추가하기" });
 
-  for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < 10; i++) {
+      fireEvent.change(screen.getByPlaceholderText("이름"), {
+        target: { value: `참가자${i}` },
+      });
+
+      fireEvent.change(screen.getByPlaceholderText("example2@domain.com"), {
+        target: { value: `user${i}@test.com` },
+      });
+
+      fireEvent.click(addButton);
+    }
+
     fireEvent.change(screen.getByPlaceholderText("이름"), {
-      target: { value: `참가자${i}` },
+      target: { value: "초과" },
     });
 
     fireEvent.change(screen.getByPlaceholderText("example2@domain.com"), {
-      target: { value: `user${i}@test.com` },
+      target: { value: "over@test.com" },
     });
 
     fireEvent.click(addButton);
-  }
 
-  fireEvent.change(screen.getByPlaceholderText("이름"), {
-    target: { value: "초과" },
-  });
-
-  fireEvent.change(screen.getByPlaceholderText("example2@domain.com"), {
-    target: { value: "over@test.com" },
-  });
-
-  fireEvent.click(addButton);
-
-  expect(screen.getAllByRole("listitem")).toHaveLength(10);
-  expect(screen.getByText("최대 10명까지 등록 가능합니다.")).toBeInTheDocument();
+    expect(screen.getAllByRole("listitem")).toHaveLength(10);
+    expect(screen.getByText("최대 10명까지 등록 가능합니다.")).toBeInTheDocument();
 });
 
   test("중복 이메일은 추가되지 않는다", async () => {

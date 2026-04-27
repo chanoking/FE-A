@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import type { Dispatch, SetStateAction } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import "../css/enrollment.css";
@@ -12,7 +13,15 @@ type PersonalFormValues = {
   reason: string;
 };
 
-export default function PersonalRegistrationForm() {
+type Props = {
+  formData: PersonalFormValues;
+  setFormData: Dispatch<SetStateAction<PersonalFormValues>>;
+};
+
+export default function PersonalRegistrationForm({
+  formData,
+  setFormData,
+}: Props) {
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -26,14 +35,14 @@ export default function PersonalRegistrationForm() {
     handleSubmit,
     watch,
     setValue,
-    formState: { errors, isSubmitted },
+    formState: { errors },
   } = useForm<PersonalFormValues>({
     mode: "onBlur",
     defaultValues: {
-      name: info?.name ?? "",
-      email: info?.email ?? "",
-      phone: info?.phone ?? "",
-      reason: info?.reason ?? "",
+      name: info?.name ?? formData.name,
+      email: info?.email ?? formData.email,
+      phone: info?.phone ?? formData.phone,
+      reason: info?.reason ?? formData.reason,
     },
   });
 
@@ -47,6 +56,8 @@ export default function PersonalRegistrationForm() {
   const possibleSeat = "가능인원: ";
 
   const onSubmit = (data: PersonalFormValues) => {
+    setFormData(data);
+
     navigate("/confirm", {
       state: {
         info: data,
@@ -92,7 +103,9 @@ export default function PersonalRegistrationForm() {
               <span
                 className="transition-to-group"
                 onClick={() => {
-                  navigate("/enrollment-group", { state: { course } });
+                  navigate("/enrollment-group", {
+                    state: { course, info: watch() },
+                  });
                 }}
               >
                 그룹 신청으로 전환

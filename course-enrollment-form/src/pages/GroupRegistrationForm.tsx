@@ -15,7 +15,7 @@ type GroupFormValues = {
   representativePhoneNumber: string;
 };
 
-export default function GroupRegistrationForm() {
+export default function GroupRegistrationForm({formData, setFormData}) {
   const location = useLocation();
   const navigate = useNavigate();
 
