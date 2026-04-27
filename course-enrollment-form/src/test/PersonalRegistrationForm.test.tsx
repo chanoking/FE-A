@@ -32,7 +32,9 @@ const mockCourse = {
 
 const renderPage = (state?: unknown) => {
   return render(
-    <MemoryRouter initialEntries={[{ pathname: "/enrollment-personal", state }]}>
+    <MemoryRouter
+      initialEntries={[{ pathname: "/enrollment-personal", state }]}
+    >
       <PersonalRegistrationForm />
     </MemoryRouter>
   );

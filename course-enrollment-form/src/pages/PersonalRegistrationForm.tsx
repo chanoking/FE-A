@@ -1,27 +1,15 @@
 import { useState } from "react";
-import type { Dispatch, SetStateAction } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
+import { useLocation, useNavigate } from "react-router-dom";
 import "../css/enrollment.css";
 import type { Course } from "../types/course";
+import type { PersonalFormValues, PersonalProps } from "../types/form";
 import type { Info } from "../types/info";
-
-type PersonalFormValues = {
-  name: string;
-  email: string;
-  phone: string;
-  reason: string;
-};
-
-type Props = {
-  formData: PersonalFormValues;
-  setFormData: Dispatch<SetStateAction<PersonalFormValues>>;
-};
 
 export default function PersonalRegistrationForm({
   formData,
   setFormData,
-}: Props) {
+}: PersonalProps) {
   const location = useLocation();
   const navigate = useNavigate();
 

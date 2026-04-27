@@ -1,21 +1,16 @@
 import { useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
+import { useLocation, useNavigate } from "react-router-dom";
 import "../css/enrollment.css";
 import type { Course } from "../types/course";
+import type { GroupFormValues, GroupProps } from "../types/form";
 import type { Info } from "../types/info";
 import type { Participant } from "../types/participant";
 
-type GroupFormValues = {
-  name: string;
-  email: string;
-  phone: string;
-  reason: string;
-  groupName: string;
-  representativePhoneNumber: string;
-};
-
-export default function GroupRegistrationForm({formData, setFormData}) {
+export default function GroupRegistrationForm({
+  formData,
+  setFormData,
+}: GroupProps) {
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -54,12 +49,13 @@ export default function GroupRegistrationForm({formData, setFormData}) {
   } = useForm<GroupFormValues>({
     mode: "onBlur",
     defaultValues: {
-      name: info?.name ?? "",
-      email: info?.email ?? "",
-      phone: info?.phone ?? "",
-      reason: info?.reason ?? "",
-      groupName: info?.groupName ?? "",
-      representativePhoneNumber: info?.representativePhoneNumber ?? "",
+      name: info?.name ?? formData.name,
+      email: info?.email ?? formData.email,
+      phone: info?.phone ?? formData.phone,
+      reason: info?.reason ?? formData.reason,
+      groupName: info?.groupName ?? formData.groupName,
+      representativePhoneNumber:
+        info?.representativePhoneNumber ?? formData.representativePhoneNumber,
     },
   });
 
@@ -82,6 +78,8 @@ export default function GroupRegistrationForm({formData, setFormData}) {
 
       return;
     }
+
+    setFormData(data);
 
     navigate("/confirm", {
       state: {
@@ -167,12 +165,28 @@ export default function GroupRegistrationForm({formData, setFormData}) {
 
       <div className="apply-layout">
         <div className="apply-header">
-          <div
-            className="apply-header-back"
-            onClick={() => navigate("/courses")}
-          >
-            <span>〈</span>
-            <span className="apply-header-back-text">이전으로</span>
+          <div className="added-function">
+            <div
+              className="apply-header-back"
+              onClick={() => navigate("/courses")}
+            >
+              <span>〈</span>
+              <span className="apply-header-back-text">이전으로</span>
+            </div>
+
+            <div className="transition">
+              <span
+                className="transition-to-group"
+                onClick={() => {
+                  navigate("/enrollment-personal", {
+                    state: { course, info: watch() },
+                  });
+                }}
+              >
+                개인 신청으로 전환
+              </span>
+              <span>⟩</span>
+            </div>
           </div>
 
           <div className="apply-header-bottom">
@@ -201,8 +215,8 @@ export default function GroupRegistrationForm({formData, setFormData}) {
                   },
                   maxLength: {
                     value: 10,
-                    message: "10자까지 입력 가능합니다."
-                  }
+                    message: "10자까지 입력 가능합니다.",
+                  },
                 })}
               />
 

@@ -43,7 +43,7 @@ export default function Courses() {
 
   useEffect(() => {
     const fetchCourses = async () => {
-      const res = await fetch("http://localhost:5173/courses");
+      const res = await fetch("http://localhost:5174/courses");
       const data: CourseListResponse = await res.json();
 
       setCategories(data.categories);
