@@ -10,32 +10,21 @@ import type { Participant } from "../types/participant";
 export default function GroupRegistrationForm({
   formData,
   setFormData,
+  applicationType,
+  setApplicationType,
+  courseData
 }: GroupProps) {
-  const location = useLocation();
   const navigate = useNavigate();
 
-  const { course, info } =
-    (location.state as { course?: Course; info?: Info }) ?? {};
-
-  const [participants, setParticipants] = useState<Map<string, Participant>>(
-    !info
-      ? new Map()
-      : new Map(
-          info.participants?.map((participant) => [
-            participant.email,
-            participant,
-          ])
-        )
-  );
+  const [participants, setParticipants] =
+   useState<Map<string, Participant>>(new Map(formData.participants) ?? new Map());
 
   const [addName, setAddName] = useState("");
   const [addEmail, setAddEmail] = useState("");
-
   const [emailError, setEmailError] = useState(false);
   const [emailDuplicateError, setEmailDuplicateError] = useState(false);
   const [emptyError, setEmptyError] = useState(false);
   const [sizeError, setSizeError] = useState(false);
-
   const [showSubmitError, setShowSubmitError] = useState(false);
 
   const {
@@ -49,19 +38,19 @@ export default function GroupRegistrationForm({
   } = useForm<GroupFormValues>({
     mode: "onBlur",
     defaultValues: {
-      name: info?.name ?? formData.name,
-      email: info?.email ?? formData.email,
-      phone: info?.phone ?? formData.phone,
-      reason: info?.reason ?? formData.reason,
-      groupName: info?.groupName ?? formData.groupName,
-      representativePhoneNumber:
-        info?.representativePhoneNumber ?? formData.representativePhoneNumber,
-    },
+      name: formData.name ?? "",
+      email: formData.email ?? "",
+      phone: formData.phone ?? "",
+      reason: formData.reason ?? "",
+      groupName: formData.groupName ?? "",
+      representativePhoneNumber: formData.representativePhoneNumber ?? "",
+      participants: formData.participants ?? new []
+    }
   });
 
   const reason = watch("reason") ?? "";
 
-  if (!course) {
+  if (!courseData) {
     return <div style={{ userSelect: "none" }}>잘못된 접근입니다.</div>;
   }
 
@@ -81,15 +70,7 @@ export default function GroupRegistrationForm({
 
     setFormData(data);
 
-    navigate("/confirm", {
-      state: {
-        info: {
-          ...data,
-          participants: Array.from(participants.values()),
-        },
-        course,
-      },
-    });
+    navigate("/confirm")
   };
 
   const onInvalid = () => {
@@ -160,7 +141,7 @@ export default function GroupRegistrationForm({
   return (
     <div className="enrollment-page">
       <div className="enrollment-header">
-        <h2 className="enrollment-title">{course.title}</h2>
+        <h2 className="enrollment-title">{courseData.title}</h2>
       </div>
 
       <div className="apply-layout">
@@ -179,7 +160,7 @@ export default function GroupRegistrationForm({
                 className="transition-to-group"
                 onClick={() => {
                   navigate("/enrollment-personal", {
-                    state: { course, info: watch() },
+                    state: { courseData, info: watch() },
                   });
                 }}
               >
@@ -466,11 +447,11 @@ export default function GroupRegistrationForm({
               <div className="footer-information">
                 <span className="info">
                   {deadline}
-                  {formatDate(course.endDate)}
+                  {formatDate(courseData.endDate)}
                 </span>
                 <span className="info">
                   {possibleSeat}
-                  {course.maxCapacity - course.currentEnrollment}
+                  {courseData.maxCapacity - courseData.currentEnrollment}
                 </span>
               </div>
 

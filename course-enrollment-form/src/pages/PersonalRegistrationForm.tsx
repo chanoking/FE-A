@@ -9,12 +9,11 @@ import type { Info } from "../types/info";
 export default function PersonalRegistrationForm({
   formData,
   setFormData,
+  applicationType,
+  setApplicationType,
+  courseData
 }: PersonalProps) {
-  const location = useLocation();
   const navigate = useNavigate();
-
-  const { course, info } =
-    (location.state as { course?: Course; info?: Info }) ?? {};
 
   const [showSubmitError, setShowSubmitError] = useState(false);
 
@@ -27,16 +26,16 @@ export default function PersonalRegistrationForm({
   } = useForm<PersonalFormValues>({
     mode: "onBlur",
     defaultValues: {
-      name: info?.name ?? formData.name,
-      email: info?.email ?? formData.email,
-      phone: info?.phone ?? formData.phone,
-      reason: info?.reason ?? formData.reason,
+      name: formData?.name ?? "",
+      email: formData?.email ?? "",
+      phone: formData?.phone,
+      reason: formData?.reason,
     },
   });
 
   const reason = watch("reason") ?? "";
 
-  if (!course) {
+  if (!courseData) {
     return <div style={{ userSelect: "none" }}>잘못된 접근입니다.</div>;
   }
 
@@ -46,12 +45,7 @@ export default function PersonalRegistrationForm({
   const onSubmit = (data: PersonalFormValues) => {
     setFormData(data);
 
-    navigate("/confirm", {
-      state: {
-        info: data,
-        course,
-      },
-    });
+    navigate("/confirm");
   };
 
   const onInvalid = () => {
@@ -73,7 +67,7 @@ export default function PersonalRegistrationForm({
   return (
     <div className="enrollment-page">
       <div className="enrollment-header">
-        <h2 className="enrollment-title">{course.title}</h2>
+        <h2 className="enrollment-title">{courseData.title}</h2>
       </div>
 
       <div className="apply-layout">
@@ -91,9 +85,7 @@ export default function PersonalRegistrationForm({
               <span
                 className="transition-to-group"
                 onClick={() => {
-                  navigate("/enrollment-group", {
-                    state: { course, info: watch() },
-                  });
+                  navigate("/enrollment-group");
                 }}
               >
                 그룹 신청으로 전환
@@ -220,11 +212,11 @@ export default function PersonalRegistrationForm({
               <div className="footer-information">
                 <span className="info">
                   {deadline}
-                  {formatDate(course.endDate)}
+                  {formatDate(courseData.endDate)}
                 </span>
                 <span className="info">
                   {possibleSeat}
-                  {course.maxCapacity - course.currentEnrollment}
+                  {courseData.maxCapacity - courseData.currentEnrollment}
                 </span>
               </div>
 

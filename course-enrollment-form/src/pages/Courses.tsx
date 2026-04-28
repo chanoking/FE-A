@@ -3,16 +3,21 @@ import { useNavigate } from "react-router-dom";
 import "../css/common.css";
 import "../css/courses.css";
 import type { Course, CourseListResponse } from "../types/course";
+import type {CourseValues, CourseProps} from "../tpyes/form"
 
-export default function Courses() {
+export default function Courses({
+  applicationType,
+  setApplicationType, 
+  courseData, 
+  setCourseData}: CourseProps) {
   const [categories, setCategories] = useState<string[]>([]);
   const ctgImgs: string[] = ["🌐", "🎨", "⚙️", "📊", "🎯"];
   const [selectedCategory, setSelectedCategory] = useState<string>("전체");
-  const [courses, setCourses] = useState<Course[]>([]);
   const [personalActive, setPersonalActive] = useState<boolean>(true);
   const [groupActive, setGroupActive] = useState<boolean>(false);
   const [pages, setPages] = useState(1);
   const [currentPage, setCurrentPage] = useState(1);
+  const [courses, setCourses] = useState<Course[]>([]);
 
   const navigate = useNavigate();
 
@@ -43,7 +48,7 @@ export default function Courses() {
 
   useEffect(() => {
     const fetchCourses = async () => {
-      const res = await fetch("http://localhost:5174/courses");
+      const res = await fetch("http://localhost:5173/courses");
       const data: CourseListResponse = await res.json();
 
       setCategories(data.categories);
@@ -59,6 +64,14 @@ export default function Courses() {
 
     return diffDays;
   };
+
+  const handleSubmit = (course:Course) => {
+    setCourseData(course);
+
+    return applicationType === "personal"
+     ? navigate("/enrollment-personal")
+     : navigate("/enrollment-group")
+  }
 
   return (
     <div className="page">
@@ -89,7 +102,7 @@ export default function Courses() {
         {filteredCourses.map((course, idx) => (
           <div className="course" key={idx}>
             <div className="title">{course.title}</div>
-            <div className="description">{course.description}</div>
+            <div className="course-description">{course.description}</div>
             <div className="instructor">{course.instructor}</div>
             <div className="price">₩{course.price.toLocaleString()}</div>
             <div className="status">
@@ -123,13 +136,16 @@ export default function Courses() {
                   }`}
                   onClick={() => {
                     if (personalActive) return;
+                    
 
-                    setPersonalActive((prev) => !prev);
+                    setApplicationType("personal");
+                    setPersonalActive(true);
                     setGroupActive(false);
                   }}
                 >
                   개인 선택
                 </button>
+                
                 <button
                   className={`option ${
                     groupActive && !personalActive ? "group-active" : ""
@@ -137,7 +153,8 @@ export default function Courses() {
                   onClick={() => {
                     if (groupActive) return;
 
-                    setGroupActive((prev) => !prev);
+                    setApplicationType("group");
+                    setGroupActive(true);
                     setPersonalActive(false);
                   }}
                 >
@@ -146,14 +163,7 @@ export default function Courses() {
               </div>
               <button
                 className="register-btn"
-                onClick={() => {
-                  if (course.currentEnrollment === course.maxCapacity) {
-                    return alert("가득 찼습니다.");
-                  }
-                  personalActive
-                    ? navigate("/enrollment-personal", { state: { course } })
-                    : navigate("/enrollment-group", { state: { course } });
-                }}
+                onClick={() => {handleSubmit(course)}}
               >
                 수강신청
               </button>
@@ -166,6 +176,7 @@ export default function Courses() {
         <div className="courses-pages">
           <div
             className="page-number"
+            style={{fontWeight: "bold"}}
             onClick={() => {
               if (currentPage === 1) return;
 
@@ -184,6 +195,7 @@ export default function Courses() {
           ))}
           <div
             className="page-number"
+            style={{fontWeight: "bold"}}
             onClick={() => {
               if (currentPage === pages) return;
 
