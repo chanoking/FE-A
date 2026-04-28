@@ -68,7 +68,7 @@ export default function GroupRegistrationForm({
       return;
     }
 
-    setFormData(data);
+    setFormData({...data, participants: Array.from(participants.values())});
 
     navigate("/confirm")
   };
@@ -138,6 +138,11 @@ export default function GroupRegistrationForm({
     return `${month}/${day}(${days[date.getDay()]})`;
   };
 
+  const handleTransition = () => {
+    setApplicationType("personal");
+    navigate("/enrollment-personal");
+  }
+
   return (
     <div className="enrollment-page">
       <div className="enrollment-header">
@@ -158,11 +163,7 @@ export default function GroupRegistrationForm({
             <div className="transition">
               <span
                 className="transition-to-group"
-                onClick={() => {
-                  navigate("/enrollment-personal", {
-                    state: { courseData, info: watch() },
-                  });
-                }}
+                onClick={() => handleTransition}
               >
                 개인 신청으로 전환
               </span>

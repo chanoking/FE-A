@@ -1,9 +1,13 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import {type confirmProps} from "../types/form";
 import "../css/confirm.css";
 
-export default function Confirm() {
-  const location = useLocation();
+export default function Confirm({
+  applicationType,
+  formData,
+  courseData
+}:confirmProps ) {
   const navigate = useNavigate();
 
   const [popupApply, setPopupApply] = useState(false);
@@ -12,10 +16,6 @@ export default function Confirm() {
   const [applyAgreement, setApplyAgreement] = useState(false);
   const [privacyAgreement, setPrivacyAgreement] = useState(false);
   const [showSubmitError, setShowSubmitError] = useState(false);
-
-  const { course, info } = location.state ?? {};
-  const option = info.representativePhoneNumber ? "group" : "personal";
-
 
   useEffect(() => {
     if (applyAgreement && privacyAgreement) {
@@ -35,7 +35,7 @@ export default function Confirm() {
       return;
     }
 
-    navigate("/complete", { state: { course, info } });
+    navigate("/complete");
   };
 
   return (
@@ -52,18 +52,18 @@ export default function Confirm() {
 
           <div className="confirm-row">
             <span className="confirm-label">강의명</span>
-            <span className="confirm-value">{course.title}</span>
+            <span className="confirm-value">{courseData.title}</span>
           </div>
           <div className="confirm-row">
             <span className="confirm-label">강사</span>
-            <span className="confirm-value">{course.instructor}</span>
+            <span className="confirm-value">{courseData.instructor}</span>
           </div>
           <div className="confirm-row">
             <span className="confirm-label">수강료</span>
             <span className="confirm-value">
-              {option === "personal" ?
-               course.price?.toLocaleString() : (course.price * info.participants.length).toLocaleString()}원 
-               {` (${course.price.toLocaleString()} x ${info.participants.length})`}
+              {applicationType === "personal" ?
+               `${courseData.price?.toLocaleString()}원` : `${(courseData.price * courseData.participants.length).toLocaleString()}원 
+               (${courseData.price.toLocaleString()} x $ courseData.participants.length})`}
             </span>
           </div>
         </section>
@@ -73,48 +73,51 @@ export default function Confirm() {
 
           <div className="confirm-row">
             <span className="confirm-label">이름</span>
-            <span className="confirm-value">{info.name}</span>
+            <span className="confirm-value">{courseData.name}</span>
           </div>
 
           <div className="confirm-row">
             <span className="confirm-label">이메일</span>
-            <span className="confirm-value">{info.email}</span>
+            <span className="confirm-value">{courseData.email}</span>
           </div>
 
           <div className="confirm-row">
             <span className="confirm-label">연락처</span>
-            <span className="confirm-value">{info.phone}</span>
+            <span className="confirm-value">{courseData.phone}</span>
           </div>
 
           <div className="confirm-reason-box">
             <span className="confirm-label">지원동기</span>
             <p className="confirm-reason">
-              {info.reason || "입력된 지원동기가 없습니다."}
+               {courseData.reason || "입력된 지원동기가 없습니다."}
             </p>
           </div>
         </section>
 
 
-        <section className="confirm-section">
-          <h2 className="confirm-section-title">신청 인원</h2>
-          <div className="applicants">
-            {info?.participants.map((participant, i) => (
-              <div key ={i} className="applicant">{participant.name}({participant.email})</div>
-            ))}
+        {applicationType === "group" && (
+          <>
+          <section className="confirm-section">
+            <h2 className="confirm-section-title">신청 인원</h2>
+            <div className="applicants">
+              {courseData?.participants.map((participant, i) => (
+                <div key ={i} className="applicant">{participant.name}({participant.email})</div>
+              ))}
+            </div>
+          </section>
 
-          </div>
-        </section>
 
+          <section className="confirm-section">
+            <h2 className="confirm-section-title">담당자 정보</h2>
 
-        <section className="confirm-section">
-          <h2 className="confirm-section-title">담당자 정보</h2>
+            <div className="confirm-row">
+              <span className="confirm-label">연락처</span>
+              <span className="confirm-value">{courseData.representativePhoneNumber}</span>
+            </div>
 
-          <div className="confirm-row">
-            <span className="confirm-label">연락처</span>
-            <span className="confirm-value">{info.representativePhoneNumber}</span>
-          </div>
-
-        </section>
+          </section>
+          </>
+        )}
 
         <section className="confirm-section">
           <h2 className="confirm-section-title">이용약관</h2>
@@ -178,7 +181,7 @@ export default function Confirm() {
           <button
             className="confirm-button secondary"
             onClick={() =>
-              navigate("/enrollment-personal", { state: { course, info } })
+              navigate("/enrollment-personal", { state: { courseData, courseData } })
             }
           >
             수정하기

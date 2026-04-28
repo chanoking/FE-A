@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useLocation, useNavigate } from "react-router-dom";
 import "../css/enrollment.css";
@@ -16,6 +16,7 @@ export default function PersonalRegistrationForm({
   const navigate = useNavigate();
 
   const [showSubmitError, setShowSubmitError] = useState(false);
+  const [isSubmitted, setIsSubmitted] = useState(false);
 
   const {
     register,
@@ -44,9 +45,17 @@ export default function PersonalRegistrationForm({
 
   const onSubmit = (data: PersonalFormValues) => {
     setFormData(data);
+    setIsSubmitted(true);
 
     navigate("/confirm");
   };
+
+  useEffect(() => {
+    if (isSubmitted){
+      navigate("/confirm");
+    }
+  }, [isSubmitted, navigate])
+
 
   const onInvalid = () => {
     setShowSubmitError(true);
@@ -63,6 +72,11 @@ export default function PersonalRegistrationForm({
 
     return `${month}/${day}(${days[date.getDay()]})`;
   };
+
+  const handleTransition = () => {
+    setApplicationType("group");
+    navigate("/enrollment-group");
+  }
 
   return (
     <div className="enrollment-page">
@@ -84,9 +98,7 @@ export default function PersonalRegistrationForm({
             <div className="transition">
               <span
                 className="transition-to-group"
-                onClick={() => {
-                  navigate("/enrollment-group");
-                }}
+                onClick={() => handleTransition}
               >
                 그룹 신청으로 전환
               </span>
