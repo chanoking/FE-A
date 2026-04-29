@@ -36,8 +36,8 @@ export default function PersonalRegistrationForm({
 
   const reason = watch("reason") ?? "";
 
-  if (!courseData) {
-    return <div style={{ userSelect: "none" }}>잘못된 접근입니다.</div>;
+  if (!courseData.title) {
+    return <div style={{ userSelect: "none", fontSize: 14, fontWeight: "bold", padding:30 }}>잘못된 접근입니다.</div>;
   }
 
   const deadline = "마감: ";
@@ -98,7 +98,7 @@ export default function PersonalRegistrationForm({
             <div className="transition">
               <span
                 className="transition-to-group"
-                onClick={() => handleTransition}
+                onClick={handleTransition}
               >
                 그룹 신청으로 전환
               </span>

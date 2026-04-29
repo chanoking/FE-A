@@ -10,6 +10,10 @@ export default function Complete({
   setCourseData
 }:CompleteProps) {
 
+  if (!courseData.title) {
+    return <div style={{ userSelect: "none", fontSize: 14, fontWeight: "bold", padding: 30  }}>잘못된 접근입니다.</div>;
+  }
+
   const currentDate = new Date().toISOString();
   const navigate = useNavigate();
 

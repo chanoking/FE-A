@@ -17,6 +17,10 @@ export default function Confirm({
   const [privacyAgreement, setPrivacyAgreement] = useState(false);
   const [showSubmitError, setShowSubmitError] = useState(false);
 
+  if (!courseData.title) {
+    return <div style={{ userSelect: "none", fontSize: 14, fontWeight: "bold", padding: 30  }}>잘못된 접근입니다.</div>;
+  }
+
   useEffect(() => {
     if (applyAgreement && privacyAgreement) {
       setAllAgreement(true);
