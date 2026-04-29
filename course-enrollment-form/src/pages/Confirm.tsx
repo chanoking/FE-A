@@ -73,23 +73,23 @@ export default function Confirm({
 
           <div className="confirm-row">
             <span className="confirm-label">이름</span>
-            <span className="confirm-value">{courseData.name}</span>
+            <span className="confirm-value">{formData.name}</span>
           </div>
 
           <div className="confirm-row">
             <span className="confirm-label">이메일</span>
-            <span className="confirm-value">{courseData.email}</span>
+            <span className="confirm-value">{formData.email}</span>
           </div>
 
           <div className="confirm-row">
             <span className="confirm-label">연락처</span>
-            <span className="confirm-value">{courseData.phone}</span>
+            <span className="confirm-value">{formData.phone}</span>
           </div>
 
           <div className="confirm-reason-box">
             <span className="confirm-label">지원동기</span>
             <p className="confirm-reason">
-               {courseData.reason || "입력된 지원동기가 없습니다."}
+               {formData.reason || "입력된 지원동기가 없습니다."}
             </p>
           </div>
         </section>
@@ -100,7 +100,7 @@ export default function Confirm({
           <section className="confirm-section">
             <h2 className="confirm-section-title">신청 인원</h2>
             <div className="applicants">
-              {courseData?.participants.map((participant, i) => (
+              {formData?.participants.map((participant, i) => (
                 <div key ={i} className="applicant">{participant.name}({participant.email})</div>
               ))}
             </div>
@@ -112,7 +112,7 @@ export default function Confirm({
 
             <div className="confirm-row">
               <span className="confirm-label">연락처</span>
-              <span className="confirm-value">{courseData.representativePhoneNumber}</span>
+              <span className="confirm-value">{formData.representativePhoneNumber}</span>
             </div>
 
           </section>

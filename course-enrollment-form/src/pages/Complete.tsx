@@ -1,16 +1,17 @@
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import "../css/complete.css";
-import type { Course } from "../types/course";
-import type { Info } from "../types/info";
+import type {CompleteProps} from "../types/form";
 
-export default function Complete() {
-  const location = useLocation();
-  const navigate = useNavigate();
+export default function Complete({
+  applicationType,
+  formData,
+  setFormData,
+  courseData,
+  setCourseData
+}:CompleteProps) {
 
-  const { course, info } =
-    (location.state as { course?: Course; info?: Info }) ?? {};
   const currentDate = new Date().toISOString();
-  const option = info?.representativePhoneNumber ? "group" : "personal";
+  const navigate = useNavigate();
 
   const createApplicationNo = () => {
     const date = new Date();
@@ -21,6 +22,37 @@ export default function Complete() {
 
     return `APP-${yyyymmdd}-${random}`;
   };
+
+  const goBackHome = () => {
+    setCourseData({
+      id: "",
+      title: "",
+      description: "",
+      category: "",
+      price: 0,
+      maxCapacity: 0,
+      currentEnrollment: 0,
+      startDate: "",
+      endDate: "",
+      instructor: ""
+    })
+    applicationType === "personal" ? setFormData({
+      name: "",
+      email: "",
+      phone: "",
+      reason: "",
+    })
+    : setFormData({
+      name: "",
+      email: "",
+      phone: "",
+      reason: "",
+      participants: [],
+      representativePhoneNumber: "",
+      groupName: ""
+    })
+    navigate("/courses")
+  }
 
   return (
     <div className="Complete-Page">
@@ -37,18 +69,19 @@ export default function Complete() {
 
             <div className="Complete-Registration-Row">
               <span className="Complete-Key">신청자</span>
-              <span className="Complete-Val">{info.name}</span>
+              <span className="Complete-Val">{formData.name}</span>
             </div>
 
             <div className="Complete-Registration-Row">
               <span className="Complete-Key">강의제목</span>
-              <span className="Complete-Val">{course.title}</span>
+              <span className="Complete-Val">{courseData.title}</span>
             </div>
 
             <div className="Complete-Registration-Row">
               <span className="Complete-Key">결제금액</span>
               <span className="Complete-Val">
-                {option === "personal" ? course.price.toLocaleString() : (course?.price * info?.participants.length).toLocaleString()}
+                {applicationType === "personal" ? courseData.price.toLocaleString() 
+                : (courseData?.price * formData?.participants.length).toLocaleString()}
               </span>
             </div>
 
@@ -60,7 +93,7 @@ export default function Complete() {
         </div>
 
         <div className="guide">
-          <button className="backhome" onClick={() => navigate("/courses")}>처음으로 돌아가기</button>
+          <button className="backhome" onClick={goBackHome}>처음으로 돌아가기</button>
         </div>
       </div>
     </div>

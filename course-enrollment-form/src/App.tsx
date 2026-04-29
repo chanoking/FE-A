@@ -104,13 +104,17 @@ function App() {
               <Complete
                 applicationType="personal"
                 formData={personalFormData}
+                setFormData={setPersonalFormData}
                 courseData={courseData}
+                setCourseData={setCourseData}
               />
             ) : (
               <Complete
                 applicationType="group"
                 formData={groupFormData}
+                setFormData={setGroupFormData}
                 courseData={courseData}
+                setCourseData={setCourseData}
               />
             ) 
           }

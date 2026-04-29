@@ -69,11 +69,15 @@ export type CompleteProps =
       applicationType: "personal";
       formData: PersonalFormValues;
       courseData: CourseValues;
+      setFormData: Dispatch<SetStateAction<PersonalFormValues>>;
+      setCourseData: Dispatch<SetStateAction<CourseValues>>;
     }
   | {
       applicationType: "group";
       formData: GroupFormValues;
       courseData: CourseValues;
+      setFormData: Dispatch<SetStateAction<GroupFormValues>>;
+      setCourseData: Dispatch<SetStateAction<CourseValues>>;
     };
 
 
