@@ -8,7 +8,6 @@ import userEvent from "@testing-library/user-event";
 
 const mockNavigate = vi.fn();
 const setCourseData = vi.fn();
-const setApplicationType = vi.fn();
 
 vi.mock("react-router-dom", async () => {
   const actual = await vi.importActual<typeof import("react-router-dom")>(

@@ -1,9 +1,12 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { MemoryRouter, Route, Routes } from "react-router-dom";
-import { describe, expect, test } from "vitest";
+import { MemoryRouter, Route, Routes, useNavigate } from "react-router-dom";
+import { describe, expect, test, vi } from "vitest";
 
 import GroupRegistrationForm from "../pages/GroupRegistrationForm";
+import { useState } from "react";
+
+const mockNavigate = vi.fn();
 
 const mockCourse = {
   id: "1",
@@ -15,41 +18,119 @@ const mockCourse = {
   currentEnrollment: 5,
   startDate: "2026-05-01T00:00:00.000Z",
   endDate: "2026-05-10T00:00:00.000Z",
-  instructor: "강사",
+  instructor: "진찬호",
 };
 
-const renderWithState = (state?: unknown) => {
-  return render(
-    <MemoryRouter
-      initialEntries={[
-        {
-          pathname: "/enrollment-group",
-          state,
-        },
-      ]}
-    >
-      <Routes>
-        <Route path="/enrollment-group" element={<GroupRegistrationForm />} />
-      </Routes>
-    </MemoryRouter>
-  );
+const mockCourseB = {
+  id: "1",
+  title: "",
+  description: "설명",
+  category: "개발",
+  price: 10000,
+  maxCapacity: 20,
+  currentEnrollment: 5,
+  startDate: "2026-05-01T00:00:00.000Z",
+  endDate: "2026-05-10T00:00:00.000Z",
+  instructor: "진찬호",
 };
+
+const Wrapper = () => {
+  const [type, setType] = useState("group");
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    reason: "",
+    representativePhoneNumber: "",
+    participants: []
+  })
+
+  return (
+    <GroupRegistrationForm
+      applicationType={type}
+      setApplicationType={setType}
+      courseData={mockCourse}
+      setFormData={setForm}
+      formData={form} />
+  )
+}
+
+const WrapperB = () => {
+  const [type, setType] = useState("group");
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    reason: "",
+    representativePhoneNumber: "",
+    participants: []
+  })
+
+  return (
+    <GroupRegistrationForm
+      applicationType={type}
+      setApplicationType={setType}
+      courseData={mockCourseB}
+      setFormData={setForm}
+      formData={form} />
+  )
+}
+
+const renderGroupPage = () => {
+  return render(
+    <MemoryRouter>
+      <Wrapper />
+    </MemoryRouter>
+  )
+}
+
+vi.mock("react-router-dom", async () => {
+  const actual = await vi.importActual<typeof import("react-router-dom")>(
+    "react-router-dom"
+  );
+
+  return {
+    ...actual,
+    useNavigate: () => mockNavigate
+  }
+})
+
+// const renderGroupPage = (state?: unknown) => {
+//   return render(
+//     <MemoryRouter
+//       initialEntries={[
+//         {
+//           pathname: "/enrollment-group",
+//           state,
+//         },
+//       ]}
+//     >
+//       <Routes>
+//         <Route path="/enrollment-group" element={<GroupRegistrationForm />} />
+//       </Routes>
+//     </MemoryRouter>
+//   );
+// };
 
 describe("GroupRegistrationForm", () => {
   test("course가 없으면 에러 메시지를 보여준다", () => {
-    renderWithState({});
+    render(
+    <MemoryRouter>
+      <WrapperB />
+    </MemoryRouter>
+  )
 
     expect(screen.getByText("잘못된 접근입니다.")).toBeInTheDocument();
   });
 
   test("course가 있으면 제목이 렌더링된다", () => {
-    renderWithState({ course: mockCourse });
+    renderGroupPage();
 
-    expect(screen.getByText("React 강의")).toBeInTheDocument();
+    expect(screen.getAllByText("React 강의")[0]).toBeInTheDocument();
   });
 
   test("참가자는 최대 10명까지만 추가된다", () => {
-    renderWithState({ course: mockCourse });
+    renderGroupPage();
 
     const addButton = screen.getByRole("button", { name: "추가하기" });
 
@@ -82,7 +163,7 @@ describe("GroupRegistrationForm", () => {
   test("중복 이메일은 추가되지 않는다", async () => {
     const user = userEvent.setup();
 
-    renderWithState({ course: mockCourse });
+    renderGroupPage();
 
     const addButton = screen.getByRole("button", { name: "추가하기" });
 

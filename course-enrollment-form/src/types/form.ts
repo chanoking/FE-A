@@ -39,7 +39,6 @@ export type ApplicationType = "personal" | "group";
 export type PersonalProps = {
   formData: PersonalFormValues;
   setFormData: Dispatch<SetStateAction<PersonalFormValues>>;
-  applicationType: ApplicationType;
   setApplicationType: Dispatch<SetStateAction<ApplicationType>>;
   courseData: CourseValues;
 };
@@ -47,7 +46,6 @@ export type PersonalProps = {
 export type GroupProps = {
   formData: GroupFormValues;
   setFormData: Dispatch<SetStateAction<GroupFormValues>>;
-  applicationType: ApplicationType;
   setApplicationType: Dispatch<SetStateAction<ApplicationType>>;
   courseData: CourseValues;
 };

@@ -10,7 +10,6 @@ import type { Participant } from "../types/participant";
 export default function GroupRegistrationForm({
   formData,
   setFormData,
-  applicationType,
   setApplicationType,
   courseData
 }: GroupProps) {

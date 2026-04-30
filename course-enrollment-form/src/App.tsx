@@ -61,7 +61,6 @@ function App() {
             <PersonalRegistrationForm
               formData={personalFormData}
               setFormData={setPersonalFormData}
-              applicationType={applicationType}
               setApplicationType={setApplicationType}
               courseData = {courseData}
             />
@@ -73,7 +72,6 @@ function App() {
             <GroupRegistrationForm
               formData={groupFormData}
               setFormData={setGroupFormData}
-              applicationType={applicationType}
               setApplicationType={setApplicationType}
               courseData={courseData}
             />
