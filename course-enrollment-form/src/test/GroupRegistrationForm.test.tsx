@@ -2,9 +2,10 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter, Route, Routes, useNavigate } from "react-router-dom";
 import { describe, expect, test, vi } from "vitest";
-
+import type { Participant } from "../types/participant";
 import GroupRegistrationForm from "../pages/GroupRegistrationForm";
 import { useState } from "react";
+import type { ApplicationType, GroupFormValues } from "../types/form";
 
 const mockNavigate = vi.fn();
 
@@ -35,19 +36,19 @@ const mockCourseB = {
 };
 
 const Wrapper = () => {
-  const [type, setType] = useState("group");
-  const [form, setForm] = useState({
+  const [type, setType] = useState<ApplicationType>("group");
+  const [form, setForm] = useState<GroupFormValues>({
     name: "",
     email: "",
     phone: "",
     reason: "",
+    groupName: "",
     representativePhoneNumber: "",
     participants: []
   })
 
   return (
     <GroupRegistrationForm
-      applicationType={type}
       setApplicationType={setType}
       courseData={mockCourse}
       setFormData={setForm}
@@ -56,19 +57,19 @@ const Wrapper = () => {
 }
 
 const WrapperB = () => {
-  const [type, setType] = useState("group");
-  const [form, setForm] = useState({
+  const [type, setType] = useState<ApplicationType>("group");
+  const [form, setForm] = useState<GroupFormValues>({
     name: "",
     email: "",
     phone: "",
     reason: "",
+    groupName: "",
     representativePhoneNumber: "",
     participants: []
   })
 
   return (
     <GroupRegistrationForm
-      applicationType={type}
       setApplicationType={setType}
       courseData={mockCourseB}
       setFormData={setForm}
