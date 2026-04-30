@@ -145,12 +145,7 @@
   cursor: pointer;
 }
 
-.option.personal-active {
-  background: #111;
-  color: white;
-}
-
-.option.group-active {
+.option.active {
   background: #111;
   color: white;
 }

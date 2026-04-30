@@ -17,6 +17,7 @@ export default function Confirm({
   const [privacyAgreement, setPrivacyAgreement] = useState(false);
   const [showSubmitError, setShowSubmitError] = useState(false);
 
+  console.log(formData)
   if (!courseData.title) {
     return <div style={{ userSelect: "none", fontSize: 14, fontWeight: "bold", padding: 30  }}>잘못된 접근입니다.</div>;
   }
@@ -66,8 +67,8 @@ export default function Confirm({
             <span className="confirm-label">수강료</span>
             <span className="confirm-value">
               {applicationType === "personal" ?
-               `${courseData.price?.toLocaleString()}원` : `${(courseData.price * courseData.participants.length).toLocaleString()}원 
-               (${courseData.price.toLocaleString()} x $ courseData.participants.length})`}
+               `${courseData.price?.toLocaleString()}원` : `${(courseData.price * formData.participants.length).toLocaleString()}원 
+               (${courseData.price.toLocaleString()} x ${formData.participants.length})`}
             </span>
           </div>
         </section>

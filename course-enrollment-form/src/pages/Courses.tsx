@@ -3,12 +3,11 @@ import { useNavigate } from "react-router-dom";
 import "../css/common.css";
 import "../css/courses.css";
 import type { Course, CourseListResponse } from "../types/course";
-import type {CourseValues, CourseProps} from "../tpyes/form"
+import type {CourseProps} from "../tpyes/form"
 
 export default function Courses({
   applicationType,
   setApplicationType, 
-  courseData, 
   setCourseData}: CourseProps) {
   const [categories, setCategories] = useState<string[]>([]);
   const ctgImgs: string[] = ["🌐", "🎨", "⚙️", "📊", "🎯"];
@@ -132,33 +131,28 @@ export default function Courses({
               <div className="option-group">
                 <button
                   className={`option ${
-                    personalActive && !groupActive ? "personal-active" : ""
+                    applicationType === "personal" ? "active" : ""
                   }`}
                   onClick={() => {
-                    if (personalActive) return;
-                    
+                    if (applicationType === "personal") return;
 
                     setApplicationType("personal");
-                    setPersonalActive(true);
-                    setGroupActive(false);
                   }}
                 >
-                  개인 선택
+                  개인
                 </button>
                 
                 <button
                   className={`option ${
-                    groupActive && !personalActive ? "group-active" : ""
+                    applicationType === "group" ? "active" : ""
                   }`}
                   onClick={() => {
-                    if (groupActive) return;
+                    if (applicationType === "group") return;
 
                     setApplicationType("group");
-                    setGroupActive(true);
-                    setPersonalActive(false);
                   }}
                 >
-                  단체 선택
+                  단체
                 </button>
               </div>
               <button

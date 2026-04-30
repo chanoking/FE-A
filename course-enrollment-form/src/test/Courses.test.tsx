@@ -5,6 +5,8 @@ import { MemoryRouter } from "react-router-dom";
 import Courses from "../pages/Courses";
 
 const mockNavigate = vi.fn();
+const setCourseData = vi.fn();
+const setApplicationType = vi.fn();
 
 vi.mock("react-router-dom", async () => {
   const actual = await vi.importActual<typeof import("react-router-dom")>(
@@ -52,7 +54,12 @@ const mockResponse = {
 const renderCourses = () => {
   return render(
     <MemoryRouter>
-      <Courses />
+      <Courses
+        applicationType="personal"
+        setApplicationType={setApplicationType} 
+        courseData={null}
+        setCourseData={setCourseData}
+        />
     </MemoryRouter>
   );
 };
@@ -113,9 +120,7 @@ describe("Courses", () => {
 
     fireEvent.click(registerButtons[0]);
 
-    expect(mockNavigate).toHaveBeenCalledWith("/enrollment-personal", {
-      state: { course: mockCourses[0] },
-    });
+    expect(mockNavigate).toHaveBeenCalledWith("/enrollment-personal");
   });
 
   it("단체 선택 후 수강신청을 누르면 단체 신청 페이지로 이동한다", async () => {
@@ -124,7 +129,7 @@ describe("Courses", () => {
     await screen.findAllByText("React 강의");
 
     const groupButtons = screen.getAllByRole("button", {
-      name: "단체 선택",
+      name: "단체",
     });
 
     fireEvent.click(groupButtons[0]);
@@ -135,9 +140,7 @@ describe("Courses", () => {
 
     fireEvent.click(registerButtons[0]);
 
-    expect(mockNavigate).toHaveBeenCalledWith("/enrollment-group", {
-      state: { course: mockCourses[0] },
-    });
+    expect(mockNavigate).toHaveBeenCalledWith("/enrollment-group");
   });
 
   it("정원이 가득 찬 강의는 수강신청 시 alert를 보여주고 이동하지 않는다", async () => {
