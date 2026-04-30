@@ -1,8 +1,10 @@
 // Courses.test.tsx
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, getAllByRole } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
+import { useState } from "react";
 import Courses from "../pages/Courses";
+import userEvent from "@testing-library/user-event";
 
 const mockNavigate = vi.fn();
 const setCourseData = vi.fn();
@@ -51,18 +53,37 @@ const mockResponse = {
   courses: mockCourses,
 };
 
-const renderCourses = () => {
-  return render(
-    <MemoryRouter>
-      <Courses
-        applicationType="personal"
-        setApplicationType={setApplicationType} 
-        courseData={null}
-        setCourseData={setCourseData}
-        />
-    </MemoryRouter>
+// const renderCourses = () => {
+//   return render(
+//     <MemoryRouter>
+//       <Courses
+//         applicationType="personal"
+//         setApplicationType={setApplicationType} 
+//         courseData={null}
+//         setCourseData={setCourseData}
+//         />
+//     </MemoryRouter>
+//   );
+// };
+
+const Wrapper = () => {
+  const [type, setType] = useState("personal");
+
+  return (
+    <Courses
+      applicationType={type}
+      setApplicationType={setType}
+      setCourseData={setCourseData}
+    />
   );
 };
+
+const renderCourses = () => {
+  return render(
+  <MemoryRouter>
+    <Wrapper />
+  </MemoryRouter>
+)};
 
 describe("Courses", () => {
   beforeEach(() => {
@@ -128,17 +149,9 @@ describe("Courses", () => {
 
     await screen.findAllByText("React 강의");
 
-    const groupButtons = screen.getAllByRole("button", {
-      name: "단체",
-    });
+    await userEvent.click(screen.getAllByRole("button", { name: "단체" })[0]);
 
-    fireEvent.click(groupButtons[0]);
-
-    const registerButtons = screen.getAllByRole("button", {
-      name: "수강신청",
-    });
-
-    fireEvent.click(registerButtons[0]);
+    await userEvent.click(screen.getAllByRole("button", { name: "수강신청" })[0]);
 
     expect(mockNavigate).toHaveBeenCalledWith("/enrollment-group");
   });
@@ -152,7 +165,7 @@ describe("Courses", () => {
       name: "수강신청",
     });
 
-    fireEvent.click(registerButtons[1]);
+    await userEvent.click(registerButtons[1]);
 
     expect(window.alert).toHaveBeenCalledWith("가득 찼습니다.");
     expect(mockNavigate).not.toHaveBeenCalled();

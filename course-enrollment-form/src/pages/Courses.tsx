@@ -12,9 +12,6 @@ export default function Courses({
   const [categories, setCategories] = useState<string[]>([]);
   const ctgImgs: string[] = ["🌐", "🎨", "⚙️", "📊", "🎯"];
   const [selectedCategory, setSelectedCategory] = useState<string>("전체");
-  const [personalActive, setPersonalActive] = useState<boolean>(true);
-  const [groupActive, setGroupActive] = useState<boolean>(false);
-  const [pages, setPages] = useState(1);
   const [currentPage, setCurrentPage] = useState(1);
   const [courses, setCourses] = useState<Course[]>([]);
 
@@ -25,8 +22,6 @@ export default function Courses({
     const end = start + 20;
 
     if (selectedCategory === "전체") {
-      setPages(Math.ceil(courses.length / 20));
-
       return courses.slice(start, end);
     }
 
@@ -34,12 +29,19 @@ export default function Courses({
       (course) => course.category === selectedCategory
     );
 
-    setPages(Math.ceil(filtered.length / 20));
-
     const sliced = filtered.slice(start, end);
 
     return sliced;
   }, [courses, selectedCategory, currentPage]);
+
+  const pages = useMemo(() => {
+    const list =
+      selectedCategory === "전체"
+        ? courses
+        : courses.filter(c => c.category === selectedCategory);
+
+    return Math.ceil(list.length / 20);
+}, [courses, selectedCategory]);
 
   const clickCategory = (category: string) => {
     setSelectedCategory(category);
@@ -47,7 +49,7 @@ export default function Courses({
 
   useEffect(() => {
     const fetchCourses = async () => {
-      const res = await fetch("http://localhost:5173/courses");
+      const res = await fetch(import.meta.env.VITE_API_URL);
       const data: CourseListResponse = await res.json();
 
       setCategories(data.categories);
@@ -65,6 +67,10 @@ export default function Courses({
   };
 
   const handleSubmit = (course:Course) => {
+    if(course.currentEnrollment === course.maxCapacity){
+      return alert("가득 찼습니다.")
+    }
+
     setCourseData(course);
 
     return applicationType === "personal"
